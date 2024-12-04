@@ -1,13 +1,10 @@
-from django.contrib.auth.models import Group, User
-from rest_framework import permissions, viewsets
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from tutorial.quickstart.serializers import GroupSerializer, UserSerializer
 
-
-class UserViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    queryset = User.objects.all().order_by('-date_joined')
-    serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
+class TestView(APIView):
+    def get(self, _):
+        return Response(
+            data={"data":"Test Successful", "errorMessage":None}, status=status.HTTP_200_OK,
+            content_type="application/json", )
