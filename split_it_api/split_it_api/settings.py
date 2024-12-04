@@ -27,9 +27,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# his tells Django REST Framework (DRF) how to handle responses.
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.JSONRenderer',  # Ensure JSONRenderer is included
+        'rest_framework.renderers.JSONRenderer',
     ),
 }
 
