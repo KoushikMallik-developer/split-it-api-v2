@@ -3,5 +3,5 @@ from .views import TestView
 
 
 urlpatterns = [
-    path('endpoint/', TestView.as_view(), name='test_endpoint'),
+    path("endpoint/", TestView.as_view(), name="test_endpoint"),
 ]
