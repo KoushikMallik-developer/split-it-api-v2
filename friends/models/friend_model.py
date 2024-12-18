@@ -13,8 +13,6 @@ class Friend(GenericBaseModel):
     )
 
     def save(self, *args, **kwargs):
-        # if Friend.objects.filter(user1=self.user1, user2=self.user2).exists():
-        #     raise ValueError("This friendship already exists.")
         super().save(*args, **kwargs)
 
     def __str__(self):
