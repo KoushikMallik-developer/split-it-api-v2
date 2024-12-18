@@ -16,4 +16,4 @@ class Friend(GenericBaseModel):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"u1-{self.user1}/u2-{self.user2}"
+        return f"{self.user1} - {self.user2}"
