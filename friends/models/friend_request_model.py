@@ -1,10 +1,12 @@
 from auth_api.models.base_models.base_model import GenericBaseModel
 from django.db import models
 
+from auth_api.models.user_models.user import User
+
 
 class FriendRequest(GenericBaseModel):
-    sender = models.CharField(max_length=100)
-    receiver = models.CharField(max_length=100)
+    sender = models.ForeignKey(User, on_delete=models.CASCADE)
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
