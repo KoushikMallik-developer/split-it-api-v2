@@ -5,24 +5,20 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
+from auth_api.export_types.user_types.export_user import ExportUser
+
 
 class ExportFriendRequest(BaseModel):
-    # id: Optional[UUID]
-    # username: str
-    # email: str
-    # fname: str
-    # lname: str
-    # phone: Optional[str]
-    # image: Optional[str]
-    # is_active: bool
-    sender: str
-    receiver: str
-    # created_at: datetime.datetime
-    # updated_at: datetime.datetime
+    id: Optional[UUID]
+    sender: ExportUser
+    receiver: ExportUser
+    created_at: datetime.datetime
 
-    def __init__(self, with_id: bool = True, **kwargs):
-        # if not with_id:
-        #     kwargs["id"] = None
+    def __init__(self, **kwargs):
+        if kwargs["sender"]:
+            kwargs["sender"] = ExportUser(**kwargs["sender"].model_to_dict())
+        if kwargs["receiver"]:
+            kwargs["receiver"] = ExportUser(**kwargs["receiver"].model_to_dict())
         super().__init__(**kwargs)
 
 

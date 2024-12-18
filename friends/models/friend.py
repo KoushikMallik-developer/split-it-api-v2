@@ -6,10 +6,10 @@ from auth_api.models.user_models.user import User
 
 class Friend(GenericBaseModel):
     user1 = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="friends_initiated"
+        User, on_delete=models.CASCADE, related_name="user1"
     )
     user2 = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="friends_received"
+        User, on_delete=models.CASCADE, related_name="user2"
     )
 
     def save(self, *args, **kwargs):
