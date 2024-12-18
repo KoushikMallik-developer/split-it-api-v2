@@ -16,4 +16,4 @@ class FriendRequest(GenericBaseModel):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Friend Request from {self.sender} to {self.receiver}"
+        return f"{self.sender} -> {self.receiver}"
