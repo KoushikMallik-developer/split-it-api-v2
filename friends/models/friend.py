@@ -1,0 +1,19 @@
+from auth_api.models.base_models.base_model import GenericBaseModel
+from django.db import models
+
+from auth_api.models.user_models.user import User
+
+
+class Friend(GenericBaseModel):
+    user1 = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="friends_initiated"
+    )
+    user2 = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="friends_received"
+    )
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.user1} - {self.user2}"
