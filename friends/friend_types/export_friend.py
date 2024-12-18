@@ -1,5 +1,6 @@
 import datetime
 import typing
+import uuid
 from typing import Optional
 from uuid import UUID
 
@@ -21,10 +22,14 @@ class ExportFriend(BaseModel):
             kwargs["user2"] = ExportUser(**kwargs["user2"].model_to_dict())
         super().__init__(**kwargs)
 
+
 class ExportFriendList(BaseModel):
     friend_list: typing.List[ExportUser]
 
-    # def __init__(self, **kwargs):
-    #     if kwargs["friend_list"]:
-            # kwargs["friend_list"] = [friend.user1.id]
-        # super().__init__(**kwargs)
+    def __init__(self, user_id: str, **kwargs):
+        if kwargs["friend_list"]:
+            kwargs["friend_list"] = [
+                friend.user1 if friend.user1.id != uuid.UUID(user_id) else friend.user2
+                for friend in kwargs["friend_list"]
+            ]
+        super().__init__(**kwargs)

@@ -24,7 +24,9 @@ class UseFriendServices:
             for friend in friends:
                 export_details = ExportFriend(**friend.model_to_dict())
                 all_friend.append(export_details)
-            all_friend_details = ExportFriendList(friend_list=all_friend)
+            all_friend_details = ExportFriendList(
+                friend_list=all_friend, user_id=user_id
+            )
             return all_friend_details
         else:
             return None
