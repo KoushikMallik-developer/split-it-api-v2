@@ -16,10 +16,10 @@ class MySentFriendRequestsView(APIView):
     def get(self, request):
         try:
             user_id = decode_jwt_token(request=request)
-            sent_friend_requests = UseFriendServices.get_all_sent_friend_requests(
-                user_id
-            )
             if validate_user_uid(uid=user_id).is_validated:
+                sent_friend_requests = UseFriendServices.get_all_sent_friend_requests(
+                    user_id
+                )
                 return Response(
                     data={
                         "data": (
