@@ -5,11 +5,9 @@ from auth_api.models.user_models.user import User
 
 
 class FriendRequest(GenericBaseModel):
-    sender = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="friend_requests_sent"
-    )
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sender")
     receiver = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="friend_requests_received"
+        User, on_delete=models.CASCADE, related_name="receiver"
     )
 
     def save(self, *args, **kwargs):
