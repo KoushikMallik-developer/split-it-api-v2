@@ -16,15 +16,15 @@ class MySentFriendRequestsView(APIView):
     def get(self, request):
         try:
             user_id = decode_jwt_token(request=request)
-            all_friend_requests = UseFriendServices.get_all_sent_friend_requests(
+            sent_friend_requests = UseFriendServices.get_all_sent_friend_requests(
                 user_id
             )
             if validate_user_uid(uid=user_id).is_validated:
                 return Response(
                     data={
                         "data": (
-                            all_friend_requests.model_dump()
-                            if all_friend_requests is not None
+                            sent_friend_requests.model_dump()
+                            if sent_friend_requests is not None
                             else {}
                         ),
                         "errorMessage": None,
