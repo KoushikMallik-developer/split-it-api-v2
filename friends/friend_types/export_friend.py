@@ -7,6 +7,7 @@ from uuid import UUID
 from pydantic import BaseModel
 
 from auth_api.export_types.user_types.export_user import ExportUser
+from auth_api.models.user_models.user import User
 
 
 class ExportFriend(BaseModel):
@@ -27,7 +28,8 @@ class ExportFriendList(BaseModel):
     friend_list: typing.List[ExportUser]
 
     def __init__(self, user_id: str, **kwargs):
-        if kwargs["friend_list"]:
+        if isinstance(kwargs["friend_list"], User):
+            # get friend list except self user from friend list
             kwargs["friend_list"] = [
                 friend.user1 if friend.user1.id != uuid.UUID(user_id) else friend.user2
                 for friend in kwargs["friend_list"]
