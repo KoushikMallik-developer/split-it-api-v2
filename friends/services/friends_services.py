@@ -34,7 +34,9 @@ class UseFriendServices:
     @staticmethod
     def get_all_friend_requests(user_id: str) -> Optional[ExportFriendRequest]:
         try:
-            requests = FriendRequest.objects.all()
+            requests = FriendRequest.objects.filter(
+                Q(sender__id=user_id) | Q(receiver__id=user_id)
+            )
         except Exception:
             raise DatabaseError()
         if requests:
@@ -43,7 +45,7 @@ class UseFriendServices:
                 export_requests = ExportFriendRequest(**req.model_to_dict())
                 friend_requests.append(export_requests)
             all_friend_details = ExportFriendRequestList(
-                friend_requests=friend_requests
+                friend_requests=friend_requests, user_id=user_id
             )
             return all_friend_details
         else:

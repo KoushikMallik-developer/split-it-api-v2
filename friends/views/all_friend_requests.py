@@ -20,7 +20,11 @@ class AllFriendRequestsView(APIView):
             if validate_user_uid(uid=user_id).is_validated:
                 return Response(
                     data={
-                        "data": all_friend_requests.model_dump(),
+                        "data": (
+                            all_friend_requests.model_dump()
+                            if all_friend_requests is not None
+                            else {}
+                        ),
                         "errorMessage": None,
                     },
                     status=status.HTTP_200_OK,

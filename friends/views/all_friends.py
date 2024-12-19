@@ -19,7 +19,10 @@ class AllFriendsView(APIView):
             friends = UseFriendServices.get_all_friends_service(user_id)
             if validate_user_uid(uid=user_id).is_validated:
                 return Response(
-                    data={"data": friends.model_dump(), "errorMessage": None},
+                    data={
+                        "data": friends.model_dump() if friends is not None else {},
+                        "errorMessage": None,
+                    },
                     status=status.HTTP_200_OK,
                     content_type="application/json",
                 )
