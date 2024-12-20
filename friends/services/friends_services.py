@@ -119,17 +119,21 @@ class UseFriendServices:
                 Q(user1=sender, user2=receiver) | Q(user1=receiver, user2=sender)
             ).exists()
 
-            receiver_info: str = receiver.username.upper() if receiver.username else receiver.email
+            is_self_user: bool = True if sender.id == receiver.id else False
 
-            print(f"already_sent_request_{already_sent_request}")
-            print(f"already_a_friend{already_a_friend}")
-            print("ONION")
+            receiver_info: str = receiver.username.upper() if receiver.username else receiver.email
 
             # Check if a friend request already exists
             if already_sent_request:
                 return {
                     "successMessage": None,
                     "errorMessage": f"Friend request already sent to this {receiver_info}.",
+                }
+
+            if is_self_user:
+                return {
+                    "successMessage": None,
+                    "errorMessage": f"You can't send request to yourself",
                 }
 
             # Check if they are already friends
