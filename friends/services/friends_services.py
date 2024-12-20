@@ -115,6 +115,8 @@ class UseFriendServices:
 
             already_sent_request: bool = FriendRequest.objects.filter(sender=sender, receiver=receiver).exists()
 
+            reversed_sent_request: bool = FriendRequest.objects.filter(sender=receiver, receiver=sender).exists()
+
             already_a_friend: bool = Friend.objects.filter(
                 Q(user1=sender, user2=receiver) | Q(user1=receiver, user2=sender)
             ).exists()
@@ -123,6 +125,13 @@ class UseFriendServices:
 
             receiver_info: str = receiver.username.upper() if receiver.username else receiver.email
 
+            # sender cant be receiver
+            if is_self_user:
+                return {
+                    "successMessage": None,
+                    "errorMessage": f"You can't send request to yourself",
+                }
+
             # Check if a friend request already exists
             if already_sent_request:
                 return {
@@ -130,10 +139,11 @@ class UseFriendServices:
                     "errorMessage": f"Friend request already sent to this {receiver_info}.",
                 }
 
-            if is_self_user:
+            # Check if the reverse friend request exists (receiver has sent to sender)
+            if reversed_sent_request:
                 return {
                     "successMessage": None,
-                    "errorMessage": f"You can't send request to yourself",
+                    "errorMessage": "This user has already sent you a friend request.",
                 }
 
             # Check if they are already friends
