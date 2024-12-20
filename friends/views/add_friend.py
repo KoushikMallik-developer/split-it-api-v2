@@ -33,7 +33,7 @@ class AddFriend(APIView):
                 else:
                     return Response(
                         data={
-                            "data": "Something went wrong",
+                            "data": result.get("errorMessage"),
                             "errorMessage": None,
                         },
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR,

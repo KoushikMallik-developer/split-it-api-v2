@@ -1,12 +1,9 @@
-import logging
 from typing import Optional
 from rest_framework import serializers
 
 from auth_api.export_types.validation_types.validation_result import ValidationResult
-from auth_api.models.user_models.user import User
 from auth_api.services.helpers import validate_user_email
 from friends.models.friend import Friend
-from friends.models.friend_request import FriendRequest
 
 
 class FriendSerializer(serializers.ModelSerializer):

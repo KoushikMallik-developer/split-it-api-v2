@@ -113,11 +113,40 @@ class UseFriendServices:
             receiver: User = User.objects.get(email=request_data.user_email)
             sender: User = User.objects.get(id=uid)
 
+            already_sent_request: bool = FriendRequest.objects.filter(sender=sender, receiver=receiver).exists()
+
+            already_a_friend: bool = Friend.objects.filter(
+                Q(user1=sender, user2=receiver) | Q(user1=receiver, user2=sender)
+            ).exists()
+
+            receiver_info: str = receiver.username.upper() if receiver.username else receiver.email
+
+            print(f"already_sent_request_{already_sent_request}")
+            print(f"already_a_friend{already_a_friend}")
+            print("ONION")
+
+            # Check if a friend request already exists
+            if already_sent_request:
+                return {
+                    "successMessage": None,
+                    "errorMessage": f"Friend request already sent to this {receiver_info}.",
+                }
+
+            # Check if they are already friends
+            if already_a_friend:
+                return {
+                    "successMessage": None,
+                    "errorMessage": f"You are already friends with this {receiver_info}.",
+                }
+
             # Save the friend request
-            UseFriendServices().save_friend_request(sender=sender, receiver=receiver)
+            else:
+                UseFriendServices().save_friend_request(
+                    sender=sender, receiver=receiver
+                )
 
             return {
-                "successMessage": f"Friend request sent to {receiver.username.upper() if receiver.username else receiver.email}",
+                "successMessage": f"Friend request sent to {receiver_info}",
                 "errorMessage": None,
             }
         else:
