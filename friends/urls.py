@@ -4,6 +4,7 @@ from friends.views.all_friend_requests import AllFriendRequestsView
 from friends.views.all_friends import AllFriendsView
 from friends.views.my_received_friend_requests import MyReceivedFriendRequestsView
 from friends.views.my_sent_friend_requests import MySentFriendRequestsView
+from friends.views.add_friend import AddFriend
 
 urlpatterns = [
     path("my-friends", AllFriendsView.as_view(), name="All-Friends"),
@@ -20,6 +21,11 @@ urlpatterns = [
     path(
         "my-received-friend-requests",
         MyReceivedFriendRequestsView.as_view(),
+        name="All-Received-Requests",
+    ),
+    path(
+        "add-friend",
+        AddFriend.as_view(),
         name="All-Received-Requests",
     ),
 ]

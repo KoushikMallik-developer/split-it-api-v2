@@ -3,13 +3,21 @@ from typing import Optional
 from django.db.models import Q
 from psycopg2 import DatabaseError
 
-from friends.friend_types.export_friend import ExportFriendList, ExportFriend
-from friends.friend_types.export_friend_requests import (
+from auth_api.models.user_models.user import User
+from friends.export_types.friend_types.export_friend import (
+    ExportFriendList,
+    ExportFriend,
+)
+from friends.export_types.friend_types.export_friend_requests import (
     ExportFriendRequest,
     ExportFriendRequestList,
 )
+
+from friends.export_types.request_data_types.add_friend import AddFriendRequestType
+from friends.friend_exceptions.friend_exceptions import FriendRequestNotSentError
 from friends.models.friend import Friend
 from friends.models.friend_request import FriendRequest
+from friends.serializers.friend_serializer import FriendSerializer
 
 
 class UseFriendServices:
@@ -86,3 +94,31 @@ class UseFriendServices:
             return all_friend_details
         else:
             return None
+
+    @staticmethod
+    def save_friend_request(sender: User, receiver: User) -> FriendRequest:
+        new_friend_request = FriendRequest(sender=sender, receiver=receiver)
+        new_friend_request.save()
+        return new_friend_request
+
+    @staticmethod
+    def create_new_friend_request_service(
+        request_data: AddFriendRequestType, uid: str
+    ) -> dict:
+        is_validate_request: bool = FriendSerializer().validate(
+            data=request_data.model_dump()
+        )
+        if is_validate_request:
+            # Retrieve sender and receiver
+            receiver: User = User.objects.get(email=request_data.user_email)
+            sender: User = User.objects.get(id=uid)
+
+            # Save the friend request
+            UseFriendServices().save_friend_request(sender=sender, receiver=receiver)
+
+            return {
+                "successMessage": f"Friend request sent to {receiver.username.upper() if receiver.username else receiver.email}",
+                "errorMessage": None,
+            }
+        else:
+            raise FriendRequestNotSentError()
