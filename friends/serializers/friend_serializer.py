@@ -24,15 +24,3 @@ class FriendSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(detail=validation_result_email.error)
         if is_validated_email:
             return True
-
-    # def create(self, data: dict) -> FriendRequest:
-    #     email = data.get("user_email")
-    #     receiver: User = User.objects.get(email=email)
-    #     logging.error(f"Onion -- {receiver}")
-    #     if self.validate(data):
-    #         friend = FriendRequest(
-    #             sender=User(),
-    #             receiver=receiver,
-    #         )
-    #         friend.save()
-    #         return friend
