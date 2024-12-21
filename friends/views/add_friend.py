@@ -8,6 +8,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from auth_api.services.helpers import decode_jwt_token, validate_user_uid
 from friends.export_types.request_data_types.add_friend import AddFriendRequestType
+from friends.friend_exceptions.friend_exceptions import SelfFriendError, AlreadyFriendRequestSentError, \
+    ReversedFriendRequestError, AlreadyAFriendError
 from friends.services.friends_services import UseFriendServices
 
 
@@ -42,26 +44,62 @@ class AddFriend(APIView):
             else:
                 logging.warning("No User found in database.")
                 raise Exception("No User found in database.")
+        except SelfFriendError as e:
+            return Response(
+                data={
+                    "successMessage": None,
+                    "errorMessage": f"SelfFriendError: {e.msg}",
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                content_type="application/json",
+            )
+        except AlreadyFriendRequestSentError as e:
+            return Response(
+                data={
+                    "successMessage": None,
+                    "errorMessage": f"AlreadyFriendRequestSentError: {e.msg}",
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                content_type="application/json",
+            )
+        except ReversedFriendRequestError as e:
+            return Response(
+                data={
+                    "successMessage": None,
+                    "errorMessage": f"ReversedFriendRequestError: {e.msg}",
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                content_type="application/json",
+            )
+        except AlreadyAFriendError as e:
+            return Response(
+                data={
+                    "successMessage": None,
+                    "errorMessage": f"AlreadyAFriendError: {e.msg}",
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                content_type="application/json",
+            )
         except DatabaseError as e:
             logging.error(
-                f"DatabaseError: Error Occured While Fetching all users details: {e}"
+                f"DatabaseError: Error Occurred While Fetching all users details: {e}"
             )
             return Response(
                 data={
                     "successMessage": None,
-                    "errorMessage": f"DatabaseError: Error Occured While Fetching all users details: {e}",
+                    "errorMessage": f"DatabaseError: Error Occurred While Fetching all users details: {e}",
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 content_type="application/json",
             )
         except ValidationError as e:
             logging.error(
-                f"PydanticValidationError: Error Occured while converting to Pydantic object: {e}"
+                f"PydanticValidationError: Error Occurred while converting to Pydantic object: {e}"
             )
             return Response(
                 data={
                     "successMessage": None,
-                    "errorMessage": f"PydanticValidationError: Error Occured while converting to Pydantic object: {e}",
+                    "errorMessage": f"PydanticValidationError: Error Occurred while converting to Pydantic object: {e}",
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 content_type="application/json",
@@ -81,7 +119,7 @@ class AddFriend(APIView):
             return Response(
                 data={
                     "successMessage": None,
-                    "errorMessage": f"InternalServerError {e}",
+                    "errorMessage": f"InternalServerError: {e}",
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 content_type="application/json",

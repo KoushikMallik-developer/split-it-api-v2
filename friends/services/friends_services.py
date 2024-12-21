@@ -14,7 +14,8 @@ from friends.export_types.friend_types.export_friend_requests import (
 )
 
 from friends.export_types.request_data_types.add_friend import AddFriendRequestType
-from friends.friend_exceptions.friend_exceptions import FriendRequestNotSentError
+from friends.friend_exceptions.friend_exceptions import FriendRequestNotSentError, SelfFriendError, \
+    AlreadyFriendRequestSentError, ReversedFriendRequestError, AlreadyAFriendError
 from friends.models.friend import Friend
 from friends.models.friend_request import FriendRequest
 from friends.serializers.friend_serializer import FriendSerializer
@@ -133,31 +134,19 @@ class UseFriendServices:
 
             # sender cant be receiver
             if is_self_user:
-                return {
-                    "successMessage": None,
-                    "errorMessage": "You can't send request to yourself",
-                }
+                raise SelfFriendError()
 
             # Check if a friend request already exists
             if already_sent_request:
-                return {
-                    "successMessage": None,
-                    "errorMessage": f"Friend request already sent to this {receiver_info}.",
-                }
+                raise AlreadyFriendRequestSentError()
 
             # Check if the reverse friend request exists (receiver has sent to sender)
             if reversed_sent_request:
-                return {
-                    "successMessage": None,
-                    "errorMessage": f"{receiver_info} has already sent you a friend request.",
-                }
+                raise ReversedFriendRequestError(receiver_info)
 
             # Check if they are already friends
             if already_a_friend:
-                return {
-                    "successMessage": None,
-                    "errorMessage": f"You are already friends with this {receiver_info}.",
-                }
+                raise AlreadyAFriendError(receiver_info)
 
             # Save the friend request
             else:
