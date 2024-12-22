@@ -159,9 +159,9 @@ class UseFriendServices:
                     sender=sender, receiver=receiver
                 )
 
-            return {
-                "successMessage": f"Friend request sent to {receiver_info}",
-                "errorMessage": None,
-            }
+                return {
+                    "successMessage": f"Friend request sent to {receiver_info}",
+                    "errorMessage": None,
+                }
         else:
             raise FriendRequestNotSentError()
