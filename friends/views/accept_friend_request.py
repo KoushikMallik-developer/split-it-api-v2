@@ -26,7 +26,9 @@ class AcceptFriendRequest(APIView):
         try:
             user_id = decode_jwt_token(request=request)
             if validate_user_uid(uid=user_id).is_validated:
-                result = {}
+                result = UseFriendServices.create_new_friend_request_service(
+                    request_data=AddFriendRequestType(**request.data), uid=user_id
+                )
                 if result.get("successMessage"):
                     return Response(
                         data={

@@ -7,7 +7,7 @@ from auth_api.services.helpers import validate_user_email
 from friends.models.friend_request import FriendRequest
 
 
-class FriendSerializer(serializers.ModelSerializer):
+class FriendRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = FriendRequest
         fields = "__all__"
