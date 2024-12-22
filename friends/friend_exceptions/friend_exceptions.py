@@ -41,7 +41,11 @@ class ReversedFriendRequestError(AUTHBaseException):
 
 
 class AlreadyAFriendError(AUTHBaseException):
-    def __init__(self, receiver_info: str, msg: Optional[str] = None,):
+    def __init__(
+        self,
+        receiver_info: str,
+        msg: Optional[str] = None,
+    ):
         if not msg and receiver_info:
             self.msg = f"You are already friends with this {receiver_info}."
         else:

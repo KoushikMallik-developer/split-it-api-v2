@@ -26,6 +26,6 @@ urlpatterns = [
     path(
         "add-friend",
         AddFriend.as_view(),
-        name="All-Received-Requests",
+        name="Add-Friends",
     ),
 ]

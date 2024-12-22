@@ -6,10 +6,16 @@ from rest_framework import status
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from auth_api.auth_exceptions.user_exceptions import UserNotFoundError
 from auth_api.services.helpers import decode_jwt_token, validate_user_uid
 from friends.export_types.request_data_types.add_friend import AddFriendRequestType
-from friends.friend_exceptions.friend_exceptions import SelfFriendError, AlreadyFriendRequestSentError, \
-    ReversedFriendRequestError, AlreadyAFriendError
+from friends.friend_exceptions.friend_exceptions import (
+    SelfFriendError,
+    AlreadyFriendRequestSentError,
+    ReversedFriendRequestError,
+    AlreadyAFriendError,
+)
 from friends.services.friends_services import UseFriendServices
 
 
@@ -44,6 +50,15 @@ class AddFriend(APIView):
             else:
                 logging.warning("No User found in database.")
                 raise Exception("No User found in database.")
+        except UserNotFoundError as e:
+            return Response(
+                data={
+                    "successMessage": None,
+                    "errorMessage": f"UserNotFoundError: {e.msg}",
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                content_type="application/json",
+            )
         except SelfFriendError as e:
             return Response(
                 data={

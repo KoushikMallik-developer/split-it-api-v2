@@ -14,8 +14,13 @@ from friends.export_types.friend_types.export_friend_requests import (
 )
 
 from friends.export_types.request_data_types.add_friend import AddFriendRequestType
-from friends.friend_exceptions.friend_exceptions import FriendRequestNotSentError, SelfFriendError, \
-    AlreadyFriendRequestSentError, ReversedFriendRequestError, AlreadyAFriendError
+from friends.friend_exceptions.friend_exceptions import (
+    FriendRequestNotSentError,
+    SelfFriendError,
+    AlreadyFriendRequestSentError,
+    ReversedFriendRequestError,
+    AlreadyAFriendError,
+)
 from friends.models.friend import Friend
 from friends.models.friend_request import FriendRequest
 from friends.serializers.friend_serializer import FriendSerializer
