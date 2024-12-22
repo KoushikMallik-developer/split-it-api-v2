@@ -1,5 +1,6 @@
 from django.urls import path
 
+from friends.views.accept_friend_request import AcceptFriendRequest
 from friends.views.all_friend_requests import AllFriendRequestsView
 from friends.views.all_friends import AllFriendsView
 from friends.views.my_received_friend_requests import MyReceivedFriendRequestsView
@@ -27,5 +28,10 @@ urlpatterns = [
         "add-friend",
         AddFriend.as_view(),
         name="Add-Friends",
+    ),
+    path(
+        "accept-friend",
+        AcceptFriendRequest.as_view(),
+        name="Accept-Friends",
     ),
 ]
