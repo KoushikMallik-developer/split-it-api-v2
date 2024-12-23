@@ -37,6 +37,8 @@ class FriendRequestSerializer(serializers.ModelSerializer):
             is_validated_email = validation_result_email.is_validated
             if not is_validated_email:
                 raise UserNotFoundError(msg="This user is not registered with us.")
+        else:
+            raise ValueError("user_email is required.")
 
         receiver: User = User.objects.get(email=data.get("receiver"))
 

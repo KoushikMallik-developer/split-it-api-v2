@@ -129,6 +129,12 @@ class AddFriend(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 content_type="application/json",
             )
+        except ValueError as e:
+            return Response(
+                data={"successMessage": None, "errorMessage": f"ValueError: {e}"},
+                status=status.HTTP_400_BAD_REQUEST,
+                content_type="application/json",
+            )
         except Exception as e:
             logging.error(f"InternalServerError: {e}")
             return Response(
