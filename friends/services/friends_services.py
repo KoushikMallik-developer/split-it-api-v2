@@ -19,7 +19,7 @@ from friends.friend_exceptions.friend_exceptions import (
     SelfFriendError,
     AlreadyFriendRequestSentError,
     ReversedFriendRequestError,
-    AlreadyAFriendError,
+    AlreadyAFriendError, FriendRequestAcceptanceError,
 )
 from friends.models.friend import Friend
 from friends.models.friend_request import FriendRequest
@@ -166,12 +166,14 @@ class UseFriendServices:
         else:
             raise FriendRequestNotSentError()
 
-
-
     @staticmethod
     def accept_friend_request(sender: User, receiver: User) -> FriendRequest:
-        new_friend_request = FriendRequest(sender=sender, receiver=receiver)
+        new_friend_request: FriendRequest = FriendRequest(sender=sender, receiver=receiver)
+        new_friend: Friend = Friend(user1=sender, user2=receiver)
+
+        new_friend.save()
         new_friend_request.delete()
+
         return new_friend_request
 
     @staticmethod
@@ -182,46 +184,11 @@ class UseFriendServices:
             data=request_data.model_dump()
         )
         if is_validate_request:
+
             # Retrieve sender and receiver
             receiver: User = User.objects.get(email=request_data.user_email)
             sender: User = User.objects.get(id=uid)
 
-            already_sent_request: bool = FriendRequest.objects.filter(
-                sender=sender, receiver=receiver
-            ).exists()
-
-            reversed_sent_request: bool = FriendRequest.objects.filter(
-                sender=receiver, receiver=sender
-            ).exists()
-
-            already_a_friend: bool = Friend.objects.filter(
-                Q(user1=sender, user2=receiver) | Q(user1=receiver, user2=sender)
-            ).exists()
-
-            is_self_user: bool = True if sender.id == receiver.id else False
-
-            receiver_info: str = (
-                receiver.username.upper() if receiver.username else receiver.email
-            )
-
-            # sender cant be receiver
-            # if is_self_user:
-            #     raise SelfFriendError()
-
-            # Check if a friend request already exists
-            # if already_sent_request:
-            #     raise AlreadyFriendRequestSentError()
-
-            # Check if the reverse friend request exists (receiver has sent to sender)
-            # if reversed_sent_request:
-            #     raise ReversedFriendRequestError(receiver_info)
-
-            # Check if they are already friends
-            # if already_a_friend:
-            #     raise AlreadyAFriendError(receiver_info)
-
-            # accept the friend request
-            # else:
             UseFriendServices().accept_friend_request(sender=sender, receiver=receiver)
 
             return {
@@ -229,4 +196,4 @@ class UseFriendServices:
                 "errorMessage": None,
             }
         else:
-            raise FriendRequestNotSentError()
+            raise FriendRequestAcceptanceError()
