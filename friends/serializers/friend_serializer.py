@@ -3,88 +3,74 @@ from typing import Optional
 from django.db.models import Q
 from rest_framework import serializers
 
-from auth_api.auth_exceptions.user_exceptions import UserNotFoundError
+from auth_api.auth_exceptions.user_exceptions import (
+    UserNotFoundError,
+    UserNotAuthenticatedError,
+)
 from auth_api.export_types.validation_types.validation_result import ValidationResult
 from auth_api.models.user_models.user import User
 from auth_api.services.helpers import validate_user_email
 from friends.friend_exceptions.friend_exceptions import (
     SelfFriendError,
     AlreadyFriendRequestSentError,
-    ReversedFriendRequestError,
     AlreadyAFriendError,
 )
 from friends.models.friend import Friend
 from friends.models.friend_request import FriendRequest
 
 
-class FriendSerializer(serializers.ModelSerializer):
+class FriendRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = FriendRequest
         fields = "__all__"
 
-    def validate(self, sender: User, data: Optional[dict] = None) -> Optional[bool]:
-        is_validated_email = False
-        email = data.get("email")
+    def validate(self, data: Optional[dict] = None) -> Optional[bool]:
+        sender: User = User.objects.get(id=data.get("sender"))
+        if not sender:
+            raise UserNotAuthenticatedError()
 
-        receiver: User = User.objects.get(email=email)
-        sender: User = sender
-
-        already_sent_request: bool = FriendRequest.objects.filter(
-            sender=sender, receiver=receiver
-        ).exists()
-
-        reversed_sent_request: bool = FriendRequest.objects.filter(
-            sender=receiver, receiver=sender
-        ).exists()
-
-        already_a_friend: bool = Friend.objects.filter(
-            Q(user1=sender, user2=receiver) | Q(user1=receiver, user2=sender)
-        ).exists()
-
-        is_self_user: bool = True if sender.id == receiver.id else False
-
-        receiver_info: str = (
-            receiver.username.upper() if receiver.username else receiver.email
-        )
-
-        # Friend request receiver Email Validation
-        if email and isinstance(email, str):
-            validation_result_email: ValidationResult = validate_user_email(email)
+        # Email Validation
+        if data.get("receiver") and isinstance(data.get("receiver"), str):
+            validation_result_email: ValidationResult = validate_user_email(
+                data.get("receiver")
+            )
             is_validated_email = validation_result_email.is_validated
-
-            # user not found
             if not is_validated_email:
-                raise UserNotFoundError(msg="This user not registered with us.")
+                raise UserNotFoundError(msg="This user is not registered with us.")
 
-            # sender cant be receiver
-            if is_self_user:
-                raise SelfFriendError()
+        receiver: User = User.objects.get(email=data.get("receiver"))
 
-            # Check if a friend request already exists
-            if already_sent_request:
-                raise AlreadyFriendRequestSentError()
+        # Check if the user has already sent friend request to the same user.
+        already_sent_request: bool = (
+            FriendRequest.objects.filter(
+                sender__id=sender.id, receiver__id=receiver.id
+            ).exists()
+            or FriendRequest.objects.filter(
+                sender__id=receiver.id, receiver__id=sender.id
+            ).exists()
+        )
+        if already_sent_request:
+            raise AlreadyFriendRequestSentError()
 
-            # Check if the reverse friend request exists (receiver has sent to sender)
-            if reversed_sent_request:
-                raise ReversedFriendRequestError(receiver_info)
+        # Check if the user is already friends with the same user.
+        already_a_friend: bool = Friend.objects.filter(
+            Q(user1__id=sender.id, user2__id=receiver.id)
+            | Q(user1__id=receiver.id, user2__id=sender.id)
+        ).exists()
+        if already_a_friend:
+            raise AlreadyAFriendError()
 
-            # Check if they are already friends
-            if already_a_friend:
-                raise AlreadyAFriendError(receiver_info)
-
+        # Check if the user is sending friend request to himself.
+        is_self_user: bool = True if sender.id == receiver.id else False
+        if is_self_user:
+            raise SelfFriendError()
         # validated user
-        if is_validated_email:
-            return True
+        return True
 
     def create(self, data: dict) -> FriendRequest:
-        sender: User = data.get("Sender")
-        receiver: User = data.get("Receiver")
-        user_email: str = data.get("UserEmail")
-
-        email_data: dict = {"email": user_email}
-
-        new_friend_request = FriendRequest(sender=sender, receiver=receiver)
-
-        if self.validate(sender=sender, data=email_data):
+        if self.validate(data=data):
+            sender: User = User.objects.get(id=data.get("sender"))
+            receiver: User = User.objects.get(email=data.get("receiver"))
+            new_friend_request = FriendRequest(sender=sender, receiver=receiver)
             new_friend_request.save()
             return new_friend_request

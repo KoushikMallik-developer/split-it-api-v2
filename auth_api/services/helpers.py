@@ -13,6 +13,11 @@ from auth_api.services.definitions import EnvironmentSettings
 
 
 def validate_email(email: str) -> ValidationResult:
+    """
+    This method is specifically to find if the email id is already registered with us or not. If registered it will return False, else True. This method is for validating email while creating new user.
+    :param email: str
+    :return: ValidationResult
+    """
     if validate_email_format(email):
         existing_account = (
             True if User.objects.filter(email=email).count() > 0 else False
@@ -28,6 +33,11 @@ def validate_email(email: str) -> ValidationResult:
 
 
 def validate_user_email(email: str) -> ValidationResult:
+    """
+    This method is to check is the user email is a valid user or not. If registered it will return True, else False.
+    :param email: str
+    :return: ValidationResult
+    """
     if validate_email_format(email):
         existing_account = (
             True if User.objects.filter(email=email).count() > 0 else False

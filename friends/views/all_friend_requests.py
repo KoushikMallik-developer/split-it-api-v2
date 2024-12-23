@@ -6,6 +6,8 @@ from rest_framework import status
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.exceptions import TokenError
+
 from auth_api.services.helpers import decode_jwt_token, validate_user_uid
 from friends.services.friends_services import UseFriendServices
 
@@ -31,8 +33,17 @@ class AllFriendRequestsView(APIView):
                     content_type="application/json",
                 )
             else:
-                logging.warning("No User found in database.")
-                raise Exception("No User found in database.")
+                raise TokenError()
+        except TokenError as e:
+            logging.error(f"TokenError: {str(e)}")
+            return Response(
+                data={
+                    "successMessage": None,
+                    "errorMessage": f"TokenError: {str(e)}",
+                },
+                status=status.HTTP_401_UNAUTHORIZED,
+                content_type="application/json",
+            )
         except DatabaseError as e:
             logging.error(
                 f"DatabaseError: Error Occured While Fetching all users details: {e}"

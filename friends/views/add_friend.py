@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.exceptions import TokenError
 
 from auth_api.auth_exceptions.user_exceptions import UserNotFoundError
 from auth_api.services.helpers import decode_jwt_token, validate_user_uid
@@ -13,7 +14,6 @@ from friends.export_types.request_data_types.add_friend import AddFriendRequestT
 from friends.friend_exceptions.friend_exceptions import (
     SelfFriendError,
     AlreadyFriendRequestSentError,
-    ReversedFriendRequestError,
     AlreadyAFriendError,
 )
 from friends.services.friends_services import UseFriendServices
@@ -48,8 +48,17 @@ class AddFriend(APIView):
                         content_type="application/json",
                     )
             else:
-                logging.warning("No User found in database.")
-                raise Exception("No User found in database.")
+                raise TokenError()
+        except TokenError as e:
+            logging.error(f"TokenError: {str(e)}")
+            return Response(
+                data={
+                    "successMessage": None,
+                    "errorMessage": f"TokenError: {str(e)}",
+                },
+                status=status.HTTP_401_UNAUTHORIZED,
+                content_type="application/json",
+            )
         except UserNotFoundError as e:
             return Response(
                 data={
@@ -73,15 +82,6 @@ class AddFriend(APIView):
                 data={
                     "successMessage": None,
                     "errorMessage": f"AlreadyFriendRequestSentError: {e.msg}",
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                content_type="application/json",
-            )
-        except ReversedFriendRequestError as e:
-            return Response(
-                data={
-                    "successMessage": None,
-                    "errorMessage": f"ReversedFriendRequestError: {e.msg}",
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 content_type="application/json",

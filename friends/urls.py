@@ -24,7 +24,7 @@ urlpatterns = [
         name="All-Received-Requests",
     ),
     path(
-        "add-friend",
+        "send-friend-request",
         AddFriend.as_view(),
         name="Add-Friends",
     ),

@@ -3,7 +3,6 @@ from typing import Optional
 from django.db.models import Q
 from psycopg2 import DatabaseError
 
-from auth_api.models.user_models.user import User
 from friends.export_types.friend_types.export_friend import (
     ExportFriendList,
     ExportFriend,
@@ -17,7 +16,7 @@ from friends.export_types.request_data_types.add_friend import AddFriendRequestT
 from friends.friend_exceptions.friend_exceptions import FriendRequestNotSentError
 from friends.models.friend import Friend
 from friends.models.friend_request import FriendRequest
-from friends.serializers.friend_serializer import FriendSerializer
+from friends.serializers.friend_serializer import FriendRequestSerializer
 
 
 class UseFriendServices:
@@ -96,35 +95,17 @@ class UseFriendServices:
             return None
 
     @staticmethod
-    def save_friend_request(sender: User, receiver: User) -> FriendRequest:
-        new_friend_request = FriendRequest(sender=sender, receiver=receiver)
-        new_friend_request.save()
-        return new_friend_request
-
-    @staticmethod
     def create_new_friend_request_service(
         request_data: AddFriendRequestType, uid: str
     ) -> dict:
-
-        # Retrieve sender and receiver
-        receiver: User = User.objects.get(email=request_data.user_email)
-        sender: User = User.objects.get(id=uid)
-
-        receiver_info: str = (
-            receiver.username.upper() if receiver.username else receiver.email
-        )
-
-        if receiver:
-            data: dict = {
-                "Sender": sender,
-                "Receiver": receiver,
-                "UserEmail": request_data.user_email,
-            }
-
-            FriendSerializer().create(data=data)
-
+        data: dict = {
+            "sender": uid,
+            "receiver": request_data.user_email,
+        }
+        friend_request = FriendRequestSerializer().create(data=data)
+        if friend_request:
             return {
-                "successMessage": f"Friend request sent to {receiver_info}",
+                "successMessage": f"Friend request sent to {request_data.user_email}",
                 "errorMessage": None,
             }
         else:
