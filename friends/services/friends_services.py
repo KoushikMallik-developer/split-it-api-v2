@@ -3,13 +3,20 @@ from typing import Optional
 from django.db.models import Q
 from psycopg2 import DatabaseError
 
-from friends.friend_types.export_friend import ExportFriendList, ExportFriend
-from friends.friend_types.export_friend_requests import (
+from friends.export_types.friend_types.export_friend import (
+    ExportFriendList,
+    ExportFriend,
+)
+from friends.export_types.friend_types.export_friend_requests import (
     ExportFriendRequest,
     ExportFriendRequestList,
 )
+
+from friends.export_types.request_data_types.add_friend import AddFriendRequestType
+from friends.friend_exceptions.friend_exceptions import FriendRequestNotSentError
 from friends.models.friend import Friend
 from friends.models.friend_request import FriendRequest
+from friends.serializers.friend_serializer import FriendRequestSerializer
 
 
 class UseFriendServices:
@@ -86,3 +93,20 @@ class UseFriendServices:
             return all_friend_details
         else:
             return None
+
+    @staticmethod
+    def create_new_friend_request_service(
+        request_data: AddFriendRequestType, uid: str
+    ) -> dict:
+        data: dict = {
+            "sender": uid,
+            "receiver": request_data.user_email,
+        }
+        friend_request = FriendRequestSerializer().create(data=data)
+        if friend_request:
+            return {
+                "successMessage": f"Friend request sent to {request_data.user_email}",
+                "errorMessage": None,
+            }
+        else:
+            raise FriendRequestNotSentError()
