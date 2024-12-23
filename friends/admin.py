@@ -23,11 +23,3 @@ class FriendRequestAdmin(admin.ModelAdmin):
     list_display = ("sender", "receiver", "created_at")
     list_filter = ("sender", "receiver")
     search_fields = ("sender__username", "receiver__username")
-
-    def get_queryset(self, request):
-        """
-        Customize the queryset to filter the FriendRequest model.
-        Example: Show only active senders.
-        """
-        queryset = super().get_queryset(request)
-        return queryset.filter(sender__is_active=True)

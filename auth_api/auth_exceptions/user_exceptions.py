@@ -56,3 +56,12 @@ class UserAuthenticationFailedError(AUTHBaseException):
         else:
             super().__init__(msg)
         logging.error(self.msg)
+
+
+class UserNotAuthenticatedError(AUTHBaseException):
+    def __init__(self, msg: Optional[str] = None):
+        if not msg:
+            self.msg = "The user is not authenticated, please re-login."
+        else:
+            super().__init__(msg)
+        logging.error(self.msg)
