@@ -11,12 +11,18 @@ from friends.export_types.friend_types.export_friend_requests import (
     ExportFriendRequest,
     ExportFriendRequestList,
 )
+from friends.export_types.request_data_types.accept_friend_requeset import (
+    AcceptFriendRequestType,
+)
 
 from friends.export_types.request_data_types.add_friend import AddFriendRequestType
-from friends.friend_exceptions.friend_exceptions import FriendRequestNotSentError
+from friends.friend_exceptions.friend_exceptions import FriendRequestNotSentError, FriendRequestNotAcceptedError
 from friends.models.friend import Friend
 from friends.models.friend_request import FriendRequest
-from friends.serializers.friend_serializer import FriendRequestSerializer
+from friends.serializers.accept_friend_request_serializer import (
+    AcceptFriendRequestSerializer,
+)
+from friends.serializers.friend_request_serializer import FriendRequestSerializer
 
 
 class UseFriendServices:
@@ -110,3 +116,20 @@ class UseFriendServices:
             }
         else:
             raise FriendRequestNotSentError()
+
+    @staticmethod
+    def accept_friend_request_service(
+        request_data: AcceptFriendRequestType, uid: str
+    ) -> dict:
+        data: dict = {
+            "sender": uid,
+            "receiver": request_data.user_email,
+        }
+        friend_request = AcceptFriendRequestSerializer().create(data=data)
+        if friend_request:
+            return {
+                "successMessage": f"Friend request accepted.",
+                "errorMessage": None,
+            }
+        else:
+            raise FriendRequestNotAcceptedError()
