@@ -30,4 +30,4 @@ class FriendRequestAdmin(admin.ModelAdmin):
         Example: Show only active senders.
         """
         queryset = super().get_queryset(request)
-        return queryset.filter(sender__is_active=True)
+        return queryset.filter()
