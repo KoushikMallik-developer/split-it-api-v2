@@ -8,15 +8,18 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 
-from auth_api.auth_exceptions.user_exceptions import UserNotFoundError
+from auth_api.auth_exceptions.user_exceptions import (
+    UserNotFoundError,
+    UserNotAuthenticatedError,
+)
 from auth_api.services.helpers import decode_jwt_token, validate_user_uid
 from friends.export_types.request_data_types.accept_friend_requeset import (
     AcceptFriendRequestType,
 )
 from friends.friend_exceptions.friend_exceptions import (
-    SelfFriendError,
-    AlreadyFriendRequestSentError,
     AlreadyAFriendError,
+    FriendRequestNotAcceptedError,
+    FriendRequestNotFoundError,
 )
 from friends.services.friends_services import UseFriendServices
 
@@ -70,25 +73,33 @@ class AcceptFriendRequest(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 content_type="application/json",
             )
-        except SelfFriendError as e:
+        except UserNotAuthenticatedError as e:
             return Response(
                 data={
                     "successMessage": None,
-                    "errorMessage": f"SelfFriendError: {e.msg}",
+                    "errorMessage": f"UserNotAuthenticatedError: {e.msg}",
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 content_type="application/json",
             )
-        except AlreadyFriendRequestSentError as e:
+        except FriendRequestNotAcceptedError as e:
             return Response(
                 data={
                     "successMessage": None,
-                    "errorMessage": f"AlreadyFriendRequestSentError: {e.msg}",
+                    "errorMessage": f"FriendRequestNotAcceptedError: {e.msg}",
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 content_type="application/json",
             )
-
+        except FriendRequestNotFoundError as e:
+            return Response(
+                data={
+                    "successMessage": None,
+                    "errorMessage": f"FriendRequestNotFoundError: {e.msg}",
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                content_type="application/json",
+            )
         except AlreadyAFriendError as e:
             return Response(
                 data={
