@@ -3,7 +3,7 @@ from auth_api.models.base_models.base_model import GenericBaseModel
 
 
 class AbstractUser(GenericBaseModel):
-    username = models.CharField(max_length=25)
+    username = models.CharField(max_length=25, null=False)
     email = models.EmailField(
         verbose_name="Email", max_length=255, unique=True, null=False
     )
