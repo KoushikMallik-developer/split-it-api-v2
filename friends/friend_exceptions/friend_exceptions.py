@@ -44,3 +44,21 @@ class AlreadyAFriendError(AUTHBaseException):
         else:
             super().__init__(msg)
         logging.error(self.msg)
+
+
+class FriendRequestNotAcceptedError(AUTHBaseException):
+    def __init__(self, msg: Optional[str] = None):
+        if not msg:
+            self.msg = "Friend Request could not be accepted."
+        else:
+            super().__init__(msg)
+        logging.error(self.msg)
+
+
+class FriendRequestNotFoundError(AUTHBaseException):
+    def __init__(self, msg: Optional[str] = None):
+        if not msg:
+            self.msg = "Friend Request is not found."
+        else:
+            super().__init__(msg)
+        logging.error(self.msg)
