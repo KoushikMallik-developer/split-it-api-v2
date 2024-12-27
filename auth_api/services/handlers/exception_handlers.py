@@ -89,7 +89,7 @@ class ExceptionHandler:
                 logging.error(
                     f"{handler['message']}: {e.msg}"
                     if hasattr(e, "msg")
-                    else f"{handler['message']}:  {str(e)}"
+                    else f"{handler['message']}: {str(e)}"
                 )
                 if isinstance(e, serializers.ValidationError):
                     e.msg = "; ".join([error for error in e.detail])
@@ -99,7 +99,7 @@ class ExceptionHandler:
                         "errorMessage": (
                             f"{handler['message']}: {e.msg}"
                             if hasattr(e, "msg")
-                            else f"{handler['message']}:  {str(e)}"
+                            else f"{handler['message']}: {str(e)}"
                         ),
                     },
                     status=handler["status"],
