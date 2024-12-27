@@ -8,6 +8,7 @@ from auth_api.auth_exceptions.user_exceptions import (
     UserNotFoundError,
     OTPNotVerifiedError,
     UserAlreadyVerifiedError,
+    PasswordNotMatchError,
 )
 from auth_api.export_types.request_data_types.change_password import (
     ChangePasswordRequestType,
@@ -26,12 +27,11 @@ from auth_api.services.email_services.email_services import EmailServices
 from auth_api.services.encryption_services.encryption_service import EncryptionServices
 from auth_api.services.helpers import (
     validate_user_email,
-    validate_password,
     validate_name,
     string_to_datetime,
     validate_dob,
     validate_phone,
-    validate_email_format,
+    validate_password_for_password_change,
 )
 from auth_api.services.otp_services.otp_services import OTPServices
 from auth_api.services.token_services.token_generator import TokenGenerator
@@ -106,13 +106,15 @@ class UserServices:
     @staticmethod
     def change_password(uid: str, request_data: ChangePasswordRequestType):
         user = User.objects.get(id=uid)
-        if validate_password(
+        if validate_password_for_password_change(
             request_data.password1, request_data.password2
         ).is_validated:
             user.password = EncryptionServices().encrypt(request_data.password1)
             user.save()
         else:
-            raise ValueError("Passwords are not matching or not in correct format.")
+            raise PasswordNotMatchError(
+                "Passwords are not matching or not in correct format."
+            )
 
     @staticmethod
     def update_user_profile(uid: str, request_data: UpdateUserProfileRequestType):
@@ -164,14 +166,25 @@ class UserServices:
 
     @staticmethod
     def verify_user_with_otp(request_data: VerifyOTPRequestType):
+        """
+        Verify the user with the given OTP.
+
+        Args:
+        - request_data (VerifyOTPRequestType): The object that contains the email and otp to verify.
+
+        Returns:
+        - The token, if the user is verified.
+
+        Raises:
+        - OTPNotVerifiedError: If the OTP is not verified.
+        - UserAlreadyVerifiedError: If the user is already verified.
+        - UserNotFoundError: If the user is not found.
+        - ValueError: If the email and OTP are invalid.
+        """
         email = request_data.email
         otp = request_data.otp
-        if email and validate_email_format(email) and otp and len(otp) == 6:
-            user_exists = (
-                True if User.objects.filter(email=email).count() > 0 else False
-            )
-
-            if user_exists:
+        if email and validate_user_email(email=email).is_validated:
+            if otp and len(otp) == 6:
                 user = User.objects.get(email=email)
                 user = ExportUser(**user.model_to_dict())
                 if not user.is_active:
@@ -184,6 +197,6 @@ class UserServices:
                 else:
                     raise UserAlreadyVerifiedError()
             else:
-                raise UserNotFoundError()
+                raise OTPNotVerifiedError()
         else:
-            raise ValueError("Email & OTP data are invalid.")
+            raise UserNotFoundError()

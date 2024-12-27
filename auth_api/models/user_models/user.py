@@ -19,11 +19,7 @@ class User(AbstractUser):
 
     @staticmethod
     def authenticate_user(request_data: SignInRequestType) -> dict:
-        if (
-            request_data.email
-            and request_data.password
-            and len(request_data.password) >= 6
-        ):
+        if request_data.email and request_data.password:
             user_exists = (
                 True
                 if User.objects.filter(email=request_data.email).count() > 0
@@ -53,4 +49,4 @@ class User(AbstractUser):
             else:
                 raise UserNotFoundError()
         else:
-            raise ValueError("Email or password is invalid.")
+            raise ValueError("Provided Email or Password is invalid.")

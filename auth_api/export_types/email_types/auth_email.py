@@ -4,6 +4,7 @@ from typing import Optional, List
 from django.template.loader import render_to_string
 from pydantic import BaseModel
 
+from auth_api.auth_exceptions.user_exceptions import UserNotFoundError
 from auth_api.export_types.user_types.export_user import ExportUser
 from auth_api.models.user_models.user import User
 from auth_api.services.definitions import default_email
@@ -37,9 +38,9 @@ class AuthEmailMessage(BaseModel):
                     to=[user_email],
                 )
             else:
-                raise ValueError
+                raise UserNotFoundError()
         else:
-            raise ValueError
+            raise UserNotFoundError()
 
     @classmethod
     def create_otp_html_email_by_user_email(
@@ -57,6 +58,6 @@ class AuthEmailMessage(BaseModel):
                     to=[user_email],
                 )
             else:
-                raise ValueError
+                raise UserNotFoundError()
         else:
-            raise ValueError
+            raise UserNotFoundError()

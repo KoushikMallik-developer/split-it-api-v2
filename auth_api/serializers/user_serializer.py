@@ -24,8 +24,7 @@ class UserSerializer(serializers.ModelSerializer):
         email = data.get("email")
         fname = data.get("fname")
         lname = data.get("lname")
-        password1 = data.get("password1")
-        password2 = data.get("password2")
+        password = data.get("password")
 
         # Email Validation
         if email and isinstance(email, str):
@@ -41,18 +40,13 @@ class UserSerializer(serializers.ModelSerializer):
             if not is_validated_name:
                 raise serializers.ValidationError(detail=validation_result_name.error)
         # Password Validation
-        if (
-            password1
-            and password2
-            and isinstance(password1, str)
-            and isinstance(password2, str)
-        ):
-            validation_result_password: ValidationResult = validate_password(
-                password1, password2
-            )
+        if password and password != "" and isinstance(password, str):
+            validation_result_password: ValidationResult = validate_password(password)
             is_validated_password = validation_result_password.is_validated
             if not is_validated_password:
                 raise serializers.ValidationError(validation_result_password.error)
+        else:
+            raise serializers.ValidationError(detail="Password should not be empty.")
 
         if is_validated_email and is_validated_password and is_validated_name:
             return True
@@ -61,13 +55,13 @@ class UserSerializer(serializers.ModelSerializer):
         email = data.get("email")
         fname = data.get("fname")
         lname = data.get("lname")
-        password1 = data.get("password1")
+        password = data.get("password")
         if self.validate(data):
             user = User(
                 email=email,
                 fname=fname,
                 lname=lname,
-                password=EncryptionServices().encrypt(password1),
+                password=EncryptionServices().encrypt(password),
             )
             user.save()
             return user

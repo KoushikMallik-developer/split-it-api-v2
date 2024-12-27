@@ -100,15 +100,25 @@ def validate_username(username: str) -> ValidationResult:
     return ValidationResult(is_validated=True, error=None)
 
 
-def validate_password(password1: str, password2: str) -> ValidationResult:
-    if password1 == password2:
-        if len(password1) >= 6:
-            return ValidationResult(is_validated=True, error=None)
-        return ValidationResult(
-            is_validated=False, error="Password must be minimum of 6 characters"
-        )
-    else:
-        return ValidationResult(is_validated=False, error="Passwords did not match")
+def validate_password(password: str) -> ValidationResult:
+    if len(password) >= 6:
+        return ValidationResult(is_validated=True, error=None)
+    return ValidationResult(
+        is_validated=False, error="Password must be minimum of 6 characters"
+    )
+
+
+def validate_password_for_password_change(
+    password1: str, password2: str
+) -> ValidationResult:
+    if len(password1) >= 6 and len(password2) >= 6:
+        if password1 == password2:
+            ValidationResult(is_validated=True, error=None)
+        else:
+            return ValidationResult(is_validated=False, error="Passwords do not match")
+    return ValidationResult(
+        is_validated=False, error="Password must be minimum of 6 characters"
+    )
 
 
 def decode_jwt_token(request) -> str:
