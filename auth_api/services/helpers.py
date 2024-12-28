@@ -7,6 +7,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 from dateutil.parser import parse
 
+from auth_api.auth_exceptions.user_exceptions import UserNotAuthenticatedError
 from auth_api.export_types.validation_types.validation_result import ValidationResult
 from auth_api.models.user_models.user import User
 from auth_api.services.definitions import EnvironmentSettings
@@ -122,6 +123,12 @@ def validate_password_for_password_change(
 
 
 def decode_jwt_token(request) -> str:
+    if (
+        "Authorization" not in request.headers
+        or not request.headers.get("Authorization")
+        or not isinstance(request.headers.get("Authorization"), str)
+    ):
+        raise UserNotAuthenticatedError()
     token = request.headers.get("Authorization", "").split(" ")[1]
     token = AccessToken(token)
     payload = token.payload

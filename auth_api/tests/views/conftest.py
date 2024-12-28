@@ -49,3 +49,20 @@ def api_client():
     from rest_framework.test import APIClient
 
     return APIClient()
+
+
+@pytest.fixture
+def access_token(api_client):
+    signin_data = {
+        "email": "koushikmallik001@gmail.com",
+        "password": "1234567",  # pragma: allowlist-secret # noqa
+    }
+
+    response = api_client.post(
+        "http://localhost:8000/auth/api/v2/sign-in", signin_data, format="json"
+    )
+    response = response.json()
+    if "token" not in response:
+        raise ValueError("Token not found in response")
+    token = response["token"]["access"]
+    return token
