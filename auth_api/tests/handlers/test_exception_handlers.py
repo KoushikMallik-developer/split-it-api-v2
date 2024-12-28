@@ -17,7 +17,7 @@ class TestExceptionHandler:
         handler = ExceptionHandler()
         exception = UserNotFoundError("User not found")
         response = handler.handle_exception(exception)
-        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data["errorMessage"] == "UserNotFoundError: User not found"
 
     def test_handle_exception_user_already_verified(self):

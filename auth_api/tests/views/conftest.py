@@ -42,3 +42,10 @@ def create_test_user(user_list):
 @pytest.fixture
 def empty_database(user_list):
     User.objects.all().delete()
+
+
+@pytest.fixture
+def api_client():
+    from rest_framework.test import APIClient
+
+    return APIClient()

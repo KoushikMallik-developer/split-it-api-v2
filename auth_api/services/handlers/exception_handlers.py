@@ -34,7 +34,7 @@ class ExceptionHandler:
             },
             UserNotFoundError: {
                 "message": "UserNotFoundError",
-                "status": status.HTTP_404_NOT_FOUND,
+                "status": status.HTTP_400_BAD_REQUEST,
             },
             UserAlreadyVerifiedError: {
                 "message": "UserAlreadyVerifiedError",
