@@ -7,8 +7,7 @@ on:
       - develop
   pull_request:
     branches:
-      - master  # Run on pull requests to the main branch
-      - develop
+      - '**'  # Run on pull requests to any branch
 
 jobs:
   test:
