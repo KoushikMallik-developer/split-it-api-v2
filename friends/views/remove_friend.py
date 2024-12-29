@@ -15,7 +15,7 @@ from auth_api.auth_exceptions.user_exceptions import (
 )
 from auth_api.services.helpers import decode_jwt_token, validate_user_uid
 from friends.export_types.request_data_types.remove_friend import RemoveFriendType
-from friends.friend_exceptions.friend_exceptions import FriendNotFoundError, NoFriendsError
+from friends.friend_exceptions.friend_exceptions import FriendNotFoundError
 from friends.services.friends_services import UseFriendServices
 
 
@@ -64,15 +64,6 @@ class RemoveFriendView(APIView):
                 data={
                     "successMessage": None,
                     "errorMessage": f"FriendNotFoundError: {e.msg}",
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                content_type="application/json",
-            )
-        except NoFriendsError as e:
-            return Response(
-                data={
-                    "successMessage": None,
-                    "errorMessage": f"NoFriendsError: {e.msg}",
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 content_type="application/json",
