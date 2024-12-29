@@ -22,7 +22,7 @@ from friends.export_types.request_data_types.remove_friend_requeset import (
 from friends.friend_exceptions.friend_exceptions import (
     AlreadyAFriendError,
     FriendRequestNotAcceptedError,
-    FriendRequestNotFoundError, FriendRequestExistenceError, NoFriendRequestFoundError,
+    FriendRequestNotFoundError, FriendRequestExistenceError
 )
 from friends.services.friends_services import UseFriendServices
 
@@ -90,15 +90,6 @@ class RemoveFriendRequest(APIView):
                 data={
                     "successMessage": None,
                     "errorMessage": f"FriendRequestExistenceError: {e.msg}",
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                content_type="application/json",
-            )
-        except NoFriendRequestFoundError as e:
-            return Response(
-                data={
-                    "successMessage": None,
-                    "errorMessage": f"NoFriendRequestFoundError: {e.msg}",
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 content_type="application/json",

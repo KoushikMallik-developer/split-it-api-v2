@@ -8,7 +8,7 @@ from auth_api.auth_exceptions.user_exceptions import (
 )
 from auth_api.export_types.validation_types.validation_result import ValidationResult
 from auth_api.services.helpers import validate_user_email
-from friends.friend_exceptions.friend_exceptions import NoFriendRequestFoundError,FriendRequestExistenceError
+from friends.friend_exceptions.friend_exceptions import FriendRequestExistenceError
 from friends.models.friend_request import FriendRequest
 
 
@@ -24,9 +24,6 @@ class RemoveFriendRequestSerializer(serializers.ModelSerializer):
         get_friend_request_list = FriendRequest.objects.filter(
                 Q(sender__id=user_id) | Q(receiver__id=user_id)
             )
-
-        if not get_friend_request_list.exists():
-            raise NoFriendRequestFoundError()
 
         # Email Validation
         if friend_request_email and isinstance(friend_request_email, str):
