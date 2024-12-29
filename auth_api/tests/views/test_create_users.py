@@ -7,7 +7,7 @@ from auth_api.services.definitions import DEFAULT_VERIFICATION_MESSAGE
 
 @pytest.mark.django_db
 class TestCreateUsersView:
-    url = "http://localhost:8000/auth/api/v2/create-users"
+    url = "/auth/api/v2/create-users"
 
     def test_create_user_success(self):
         client = APIClient()

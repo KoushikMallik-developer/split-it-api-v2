@@ -60,7 +60,7 @@ class TestSendOTPView:
         data = {"email": "nonexistentuser@example.com"}
         response = client.post(self.url, data, format="json")
 
-        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert (
             response.data["errorMessage"]
             == "UserNotFoundError: This user is not registered. Please register as new user."
@@ -72,7 +72,7 @@ class TestSendOTPView:
         data = {"email": ""}
         response = client.post(self.url, data, format="json")
 
-        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert (
             response.data["errorMessage"]
             == "UserNotFoundError: This user is not registered. Please register as new user."

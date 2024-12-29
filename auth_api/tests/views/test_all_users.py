@@ -7,7 +7,7 @@ class TestAllUsersView:
     @pytest.mark.usefixtures("create_test_user")
     def test_get_all_users(self):
         client = APIClient()
-        url = "http://localhost:8000/auth/api/v2/all-users"
+        url = "/auth/api/v2/all-users"
         response = client.get(url, None, format="json")
 
         assert response
