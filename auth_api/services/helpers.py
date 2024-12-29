@@ -117,7 +117,9 @@ def validate_password_for_password_change(
             if password1 == password2:
                 return ValidationResult(is_validated=True, error=None)
             else:
-                return ValidationResult(is_validated=False, error="Passwords do not match")
+                return ValidationResult(
+                    is_validated=False, error="Passwords do not match"
+                )
         else:
             return ValidationResult(
                 is_validated=False, error="Password must be minimum of 6 characters"
@@ -126,7 +128,6 @@ def validate_password_for_password_change(
         return ValidationResult(
             is_validated=False, error="Please provide both the passwords"
         )
-
 
 
 def decode_jwt_token(request) -> str:
