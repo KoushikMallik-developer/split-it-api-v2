@@ -82,7 +82,7 @@ class UserServices:
                 == "OK"
             ):
                 return {
-                    "successMessage": "Password reset link sent successfully.",
+                    "successMessage": "Password reset email sent successfully.",
                     "errorMessage": None,
                 }
             else:
