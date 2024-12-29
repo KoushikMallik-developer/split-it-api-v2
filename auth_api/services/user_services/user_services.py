@@ -121,39 +121,52 @@ class UserServices:
         user = User.objects.get(id=uid)
         if (
             request_data.image
+            and isinstance(request_data.image, str)
             and request_data.image != ""
             and request_data.image != user.image
         ):
             user.image = request_data.image
         if (
             request_data.fname
+            and isinstance(request_data.fname, str)
             and request_data.fname != ""
             and request_data.fname != user.fname
         ):
             if validate_name(request_data.fname).is_validated:
                 user.fname = request_data.fname
+            else:
+                raise ValueError("First name is not in correct format.")
         if (
             request_data.lname
+            and isinstance(request_data.lname, str)
             and request_data.lname != ""
             and request_data.lname != user.lname
         ):
             if validate_name(request_data.lname).is_validated:
                 user.lname = request_data.lname
+            else:
+                raise ValueError("Last name is not in correct format.")
         if (
             request_data.dob
+            and isinstance(request_data.dob, str)
             and request_data.dob != ""
             and request_data.dob != user.fname
         ):
             dob = string_to_datetime(request_data.dob)
             if validate_dob(dob).is_validated:
                 user.dob = dob
+            else:
+                raise ValueError(validate_dob(dob).error)
         if (
             request_data.phone
+            and isinstance(request_data.phone, str)
             and request_data.phone != ""
             and request_data.phone != user.phone
         ):
             if validate_phone(phone=request_data.phone).is_validated:
                 user.phone = request_data.phone
+            else:
+                raise ValueError(validate_phone(phone=request_data.phone).error)
         user.save()
 
     @staticmethod
