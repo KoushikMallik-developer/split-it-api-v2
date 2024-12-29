@@ -26,7 +26,7 @@ class ExceptionHandler:
             },
             ValidationError: {
                 "message": "PydanticValidationError: Error Occured while converting to Pydantic object",
-                "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                "status": status.HTTP_400_BAD_REQUEST,
             },
             NotImplementedError: {
                 "message": "NotImplementedError",
@@ -62,7 +62,7 @@ class ExceptionHandler:
             },
             PasswordNotMatchError: {
                 "message": "PasswordNotMatchError",
-                "status": status.HTTP_422_UNPROCESSABLE_ENTITY,
+                "status": status.HTTP_400_BAD_REQUEST,
             },
             ValueError: {
                 "message": "ValueError",

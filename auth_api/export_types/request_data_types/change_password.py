@@ -4,5 +4,5 @@ from pydantic import BaseModel
 
 
 class ChangePasswordRequestType(BaseModel):
-    password1: Optional[str]
-    password2: Optional[str]
+    password1: Optional[str] = None
+    password2: Optional[str] = None

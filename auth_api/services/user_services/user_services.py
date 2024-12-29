@@ -106,15 +106,18 @@ class UserServices:
     @staticmethod
     def change_password(uid: str, request_data: ChangePasswordRequestType):
         user = User.objects.get(id=uid)
-        if validate_password_for_password_change(
-            request_data.password1, request_data.password2
-        ).is_validated:
-            user.password = EncryptionServices().encrypt(request_data.password1)
-            user.save()
+        if request_data.password1 and request_data.password2:
+            if validate_password_for_password_change(
+                request_data.password1, request_data.password2
+            ).is_validated:
+                user.password = EncryptionServices().encrypt(request_data.password1)
+                user.save()
+            else:
+                raise PasswordNotMatchError(
+                    "Passwords are not matching or not in correct format."
+                )
         else:
-            raise PasswordNotMatchError(
-                "Passwords are not matching or not in correct format."
-            )
+            raise ValueError("Please provide both the passwords.")
 
     @staticmethod
     def update_user_profile(uid: str, request_data: UpdateUserProfileRequestType):

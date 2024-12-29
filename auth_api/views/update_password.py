@@ -23,7 +23,7 @@ class UpdatePasswordView(APIView):
                 )
                 return Response(
                     data={
-                        "successMessage": "Password Changed Successfully.",
+                        "successMessage": "Password updated successfully.",
                         "errorMessage": None,
                     },
                     status=status.HTTP_200_OK,
