@@ -20,7 +20,7 @@ class RemoveFriendSerializer(serializers.ModelSerializer):
         user_id: str = data.get("primary_user_id")
 
         # Check if the user has any friends
-        friends = Friend.objects.filter(Q(user1__id=user_id) | Q(user2__id=user_id))
+        # friends = Friend.objects.filter(Q(user1__id=user_id) | Q(user2__id=user_id))
 
         # Email Validation
         if data.get("user_email") and isinstance(data.get("user_email"), str):
@@ -34,7 +34,7 @@ class RemoveFriendSerializer(serializers.ModelSerializer):
             raise ValueError("user_email is required.")
 
         # Check if the friend exists with the provided email
-        friend_exists = friends.filter(
+        friend_exists = Friend.objects.filter(
             Q(user1__email=data.get("user_email"))
             | Q(user2__email=data.get("user_email"))
         ).exists()
