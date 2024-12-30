@@ -13,17 +13,11 @@ from auth_api.auth_exceptions.user_exceptions import (
     UserNotAuthenticatedError,
 )
 from auth_api.services.helpers import decode_jwt_token, validate_user_uid
-from friends.export_types.request_data_types.accept_friend_requeset import (
-    AcceptFriendRequestType,
-)
+
 from friends.export_types.request_data_types.remove_friend_requeset import (
     RemoveFriendRequestType,
 )
-from friends.friend_exceptions.friend_exceptions import (
-    AlreadyAFriendError,
-    FriendRequestNotAcceptedError,
-    FriendRequestNotFoundError, FriendRequestExistenceError
-)
+from friends.friend_exceptions.friend_exceptions import FriendRequestNotFoundError
 from friends.services.friends_services import UseFriendServices
 
 
@@ -67,6 +61,15 @@ class RemoveFriendRequest(APIView):
                 status=status.HTTP_401_UNAUTHORIZED,
                 content_type="application/json",
             )
+        except FriendRequestNotFoundError as e:
+            return Response(
+                data={
+                    "successMessage": None,
+                    "errorMessage": f"FriendRequestNotFoundError: {e.msg}",
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                content_type="application/json",
+            )
         except UserNotFoundError as e:
             return Response(
                 data={
@@ -81,15 +84,6 @@ class RemoveFriendRequest(APIView):
                 data={
                     "successMessage": None,
                     "errorMessage": f"UserNotAuthenticatedError: {e.msg}",
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                content_type="application/json",
-            )
-        except FriendRequestExistenceError as e:
-            return Response(
-                data={
-                    "successMessage": None,
-                    "errorMessage": f"FriendRequestExistenceError: {e.msg}",
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 content_type="application/json",
