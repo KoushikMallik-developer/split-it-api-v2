@@ -17,11 +17,6 @@ class RemoveFriendSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def validate(self, data: Optional[dict] = None) -> Optional[bool]:
-        user_id: str = data.get("primary_user_id")
-
-        # Check if the user has any friends
-        # friends = Friend.objects.filter(Q(user1__id=user_id) | Q(user2__id=user_id))
-
         # Email Validation
         if data.get("user_email") and isinstance(data.get("user_email"), str):
             validation_result_email: ValidationResult = validate_user_email(
