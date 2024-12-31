@@ -62,3 +62,12 @@ class FriendRequestNotFoundError(AUTHBaseException):
         else:
             super().__init__(msg)
         logging.error(self.msg)
+
+
+class FriendNotFoundError(AUTHBaseException):
+    def __init__(self, msg: Optional[str] = None):
+        if not msg:
+            self.msg = "You are not friends with the mentioned user."
+        else:
+            super().__init__(msg)
+        logging.error(self.msg)
