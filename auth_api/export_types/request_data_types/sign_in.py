@@ -4,5 +4,5 @@ from pydantic import BaseModel
 
 
 class SignInRequestType(BaseModel):
-    email: Optional[str]
-    password: Optional[str]
+    email: Optional[str] = None
+    password: Optional[str] = None

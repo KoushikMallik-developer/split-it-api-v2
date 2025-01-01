@@ -64,10 +64,10 @@ class FriendRequestNotFoundError(AUTHBaseException):
         logging.error(self.msg)
 
 
-class FriendRequestExistenceError(AUTHBaseException):
+class FriendNotFoundError(AUTHBaseException):
     def __init__(self, msg: Optional[str] = None):
         if not msg:
-            self.msg = "You have not sent friend request to this user."
+            self.msg = "You are not friends with the mentioned user."
         else:
             super().__init__(msg)
         logging.error(self.msg)

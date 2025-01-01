@@ -16,9 +16,7 @@ from friends.export_types.request_data_types.accept_friend_requeset import (
 )
 
 from friends.export_types.request_data_types.add_friend import AddFriendRequestType
-from friends.export_types.request_data_types.remove_friend_requeset import (
-    RemoveFriendRequestType,
-)
+from friends.export_types.request_data_types.remove_friend import RemoveFriendType
 from friends.friend_exceptions.friend_exceptions import (
     FriendRequestNotSentError,
     FriendRequestNotAcceptedError,
@@ -29,9 +27,7 @@ from friends.serializers.accept_friend_request_serializer import (
     AcceptFriendRequestSerializer,
 )
 from friends.serializers.friend_request_serializer import FriendRequestSerializer
-from friends.serializers.remove_friend_request_serializer import (
-    RemoveFriendRequestSerializer,
-)
+from friends.serializers.remove_friend_serializer import RemoveFriendSerializer
 
 
 class UseFriendServices:
@@ -144,18 +140,11 @@ class UseFriendServices:
             raise FriendRequestNotAcceptedError()
 
     @staticmethod
-    def remove_friend_request_service(
-        request_data: RemoveFriendRequestType, uid: str
-    ) -> dict:
-        data: dict = {
-            "primary_user_id": uid,
-            "friend_request_email": request_data.user_email,
-        }
-        friend_request = RemoveFriendRequestSerializer().remove_friend_request(
-            data=data
-        )
-        if friend_request:
+    def remove_friend_service(request_data: RemoveFriendType, uid: str) -> dict:
+        data: dict = {"user_email": request_data.user_email, "primary_user_id": uid}
+        friend = RemoveFriendSerializer().remove_friend(data=data)
+        if friend:
             return {
-                "successMessage": "Friend request deleted.",
+                "successMessage": "Friend removed.",
                 "errorMessage": None,
             }
