@@ -8,5 +8,4 @@ class CreateUserRequestType(BaseModel):
     lname: Optional[str] = None
     username: Optional[str] = None
     email: Optional[str] = None
-    password1: Optional[str] = None
-    password2: Optional[str] = None
+    password: Optional[str] = None

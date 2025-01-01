@@ -65,3 +65,12 @@ class UserNotAuthenticatedError(AUTHBaseException):
         else:
             super().__init__(msg)
         logging.error(self.msg)
+
+
+class PasswordNotMatchError(AUTHBaseException):
+    def __init__(self, msg: Optional[str] = None):
+        if not msg:
+            self.msg = "Password1 and Password2 do not match."
+        else:
+            super().__init__(msg)
+        logging.error(self.msg)

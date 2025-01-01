@@ -8,6 +8,7 @@ from auth_api.auth_exceptions.user_exceptions import (
     UserNotFoundError,
     OTPNotVerifiedError,
     UserAlreadyVerifiedError,
+    PasswordNotMatchError,
 )
 from auth_api.export_types.request_data_types.change_password import (
     ChangePasswordRequestType,
@@ -26,12 +27,11 @@ from auth_api.services.email_services.email_services import EmailServices
 from auth_api.services.encryption_services.encryption_service import EncryptionServices
 from auth_api.services.helpers import (
     validate_user_email,
-    validate_password,
     validate_name,
     string_to_datetime,
     validate_dob,
     validate_phone,
-    validate_email_format,
+    validate_password_for_password_change,
 )
 from auth_api.services.otp_services.otp_services import OTPServices
 from auth_api.services.token_services.token_generator import TokenGenerator
@@ -82,7 +82,7 @@ class UserServices:
                 == "OK"
             ):
                 return {
-                    "successMessage": "Password reset link sent successfully.",
+                    "successMessage": "Password reset email sent successfully.",
                     "errorMessage": None,
                 }
             else:
@@ -106,52 +106,70 @@ class UserServices:
     @staticmethod
     def change_password(uid: str, request_data: ChangePasswordRequestType):
         user = User.objects.get(id=uid)
-        if validate_password(
-            request_data.password1, request_data.password2
-        ).is_validated:
-            user.password = EncryptionServices().encrypt(request_data.password1)
-            user.save()
+        if request_data.password1 and request_data.password2:
+            if validate_password_for_password_change(
+                request_data.password1, request_data.password2
+            ).is_validated:
+                user.password = EncryptionServices().encrypt(request_data.password1)
+                user.save()
+            else:
+                raise PasswordNotMatchError(
+                    "Passwords are not matching or not in correct format."
+                )
         else:
-            raise ValueError("Passwords are not matching or not in correct format.")
+            raise ValueError("Please provide both the passwords.")
 
     @staticmethod
     def update_user_profile(uid: str, request_data: UpdateUserProfileRequestType):
         user = User.objects.get(id=uid)
         if (
             request_data.image
+            and isinstance(request_data.image, str)
             and request_data.image != ""
             and request_data.image != user.image
         ):
             user.image = request_data.image
         if (
             request_data.fname
+            and isinstance(request_data.fname, str)
             and request_data.fname != ""
             and request_data.fname != user.fname
         ):
             if validate_name(request_data.fname).is_validated:
                 user.fname = request_data.fname
+            else:
+                raise ValueError("First name is not in correct format.")
         if (
             request_data.lname
+            and isinstance(request_data.lname, str)
             and request_data.lname != ""
             and request_data.lname != user.lname
         ):
             if validate_name(request_data.lname).is_validated:
                 user.lname = request_data.lname
+            else:
+                raise ValueError("Last name is not in correct format.")
         if (
             request_data.dob
+            and isinstance(request_data.dob, str)
             and request_data.dob != ""
             and request_data.dob != user.fname
         ):
             dob = string_to_datetime(request_data.dob)
             if validate_dob(dob).is_validated:
                 user.dob = dob
+            else:
+                raise ValueError(validate_dob(dob).error)
         if (
             request_data.phone
+            and isinstance(request_data.phone, str)
             and request_data.phone != ""
             and request_data.phone != user.phone
         ):
             if validate_phone(phone=request_data.phone).is_validated:
                 user.phone = request_data.phone
+            else:
+                raise ValueError(validate_phone(phone=request_data.phone).error)
         user.save()
 
     @staticmethod
@@ -164,14 +182,25 @@ class UserServices:
 
     @staticmethod
     def verify_user_with_otp(request_data: VerifyOTPRequestType):
+        """
+        Verify the user with the given OTP.
+
+        Args:
+        - request_data (VerifyOTPRequestType): The object that contains the email and otp to verify.
+
+        Returns:
+        - The token, if the user is verified.
+
+        Raises:
+        - OTPNotVerifiedError: If the OTP is not verified.
+        - UserAlreadyVerifiedError: If the user is already verified.
+        - UserNotFoundError: If the user is not found.
+        - ValueError: If the email and OTP are invalid.
+        """
         email = request_data.email
         otp = request_data.otp
-        if email and validate_email_format(email) and otp and len(otp) == 6:
-            user_exists = (
-                True if User.objects.filter(email=email).count() > 0 else False
-            )
-
-            if user_exists:
+        if email and validate_user_email(email=email).is_validated:
+            if otp and len(otp) == 6:
                 user = User.objects.get(email=email)
                 user = ExportUser(**user.model_to_dict())
                 if not user.is_active:
@@ -184,6 +213,6 @@ class UserServices:
                 else:
                     raise UserAlreadyVerifiedError()
             else:
-                raise UserNotFoundError()
+                raise OTPNotVerifiedError()
         else:
-            raise ValueError("Email & OTP data are invalid.")
+            raise UserNotFoundError()
