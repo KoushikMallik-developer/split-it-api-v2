@@ -42,8 +42,8 @@ urlpatterns = [
         name="Remove-Friend",
     ),
     path(
-            "remove-friend-request",
-            RemoveFriendRequest.as_view(),
-            name="Remove-Friend-Request",
-        ),
+        "remove-friend-request",
+        RemoveFriendRequest.as_view(),
+        name="Remove-Friend-Request",
+    ),
 ]

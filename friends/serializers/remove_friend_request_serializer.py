@@ -29,15 +29,15 @@ class RemoveFriendRequestSerializer(serializers.ModelSerializer):
             if not is_validated_email:
                 raise UserNotFoundError(msg="This user is not registered with us.")
         else:
-            raise ValueError("user_email is required.")
+            raise ValueError("Email is required.")
 
         # checking the provided email is part of the friend request list
-        email_in_request_list = FriendRequest.objects.filter(
+        existing_friend_request = FriendRequest.objects.filter(
             Q(sender__email=friend_request_email)
             | Q(receiver__email=friend_request_email)
         ).exists()
 
-        if not email_in_request_list:
+        if not existing_friend_request:
             raise FriendRequestNotFoundError()
 
         # validated
