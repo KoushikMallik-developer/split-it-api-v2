@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "e_app",
     "auth_api",
     "friends",
+    "groups",
     "corsheaders",
 ]
 
