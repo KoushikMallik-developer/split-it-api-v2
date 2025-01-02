@@ -8,7 +8,7 @@ class Group(GenericBaseModel):
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     members = models.ManyToManyField(User, related_name="members")
     name = models.CharField(max_length=100)
-    image = models.CharField(max_length=500)
+    image = models.CharField(max_length=500, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
