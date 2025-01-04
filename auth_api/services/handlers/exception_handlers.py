@@ -15,6 +15,7 @@ from auth_api.auth_exceptions.user_exceptions import (
     UserNotAuthenticatedError,
     PasswordNotMatchError,
 )
+from friends.friend_exceptions.friend_exceptions import FriendNotFoundError
 
 
 class ExceptionHandler:
@@ -74,6 +75,10 @@ class ExceptionHandler:
             },
             serializers.ValidationError: {
                 "message": "SerializerValidationError",
+                "status": status.HTTP_400_BAD_REQUEST,
+            },
+            FriendNotFoundError: {
+                "message": "FriendNotFoundError",
                 "status": status.HTTP_400_BAD_REQUEST,
             },
             # Exception: {

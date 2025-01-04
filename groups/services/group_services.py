@@ -1,4 +1,6 @@
 from groups.export_types.create_group import CreateGroupRequestType
+from groups.models.group import Group
+from groups.serializers.group_serializer import GroupSerializer
 
 
 class GroupServices:
@@ -6,6 +8,9 @@ class GroupServices:
     def create_new_group_service(
         request_data: CreateGroupRequestType, uid: str
     ) -> dict:
-        print(f"request_data__{request_data}")
-        print(f"uid__{uid}")
-        return {"successMessage": None, "errorMessage": "None215"}
+        data: dict = {"request_data": request_data, "uid": uid}
+        group: Group = GroupSerializer().create(data)
+        return {
+            "successMessage": f"Group {group.name} is created",
+            "errorMessage": None,
+        }
