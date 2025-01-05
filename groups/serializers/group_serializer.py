@@ -31,19 +31,33 @@ class GroupSerializer(serializers.ModelSerializer):
             for member_email in members:
 
                 # check if the member is a valid email
-                if member_email and member_email != "" and isinstance(member_email, str):
-                    validation_result_email: ValidationResult = validate_user_email(member_email)
+                if (
+                    member_email
+                    and member_email != ""
+                    and isinstance(member_email, str)
+                ):
+                    validation_result_email: ValidationResult = validate_user_email(
+                        member_email
+                    )
                     is_validated_email = validation_result_email.is_validated
                     if not is_validated_email:
-                        raise serializers.ValidationError(detail=validation_result_email.error)
+                        raise serializers.ValidationError(
+                            detail=validation_result_email.error
+                        )
 
                 # check if the member is a valid user
                 if not User.objects.filter(email=member_email).exists():
-                    raise UserNotFoundError(msg=f"User '{member_email}' does not exist.")
+                    raise UserNotFoundError(
+                        msg=f"User '{member_email}' does not exist."
+                    )
 
                 # check if the member is a friend
-                if not Friend.objects.filter(user2__id=uid, user1__id=User.objects.get(email=member_email).id).exists():
-                    raise FriendNotFoundError(msg=f"'{member_email}' is not your friend.")
+                if not Friend.objects.filter(
+                    user2__id=uid, user1__id=User.objects.get(email=member_email).id
+                ).exists():
+                    raise FriendNotFoundError(
+                        msg=f"'{member_email}' is not your friend."
+                    )
 
         return True
 

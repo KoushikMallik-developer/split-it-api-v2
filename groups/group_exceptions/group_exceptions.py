@@ -11,5 +11,3 @@ class GroupCantCreateError(AUTHBaseException):
         else:
             super().__init__(msg)
         logging.error(self.msg)
-
-
