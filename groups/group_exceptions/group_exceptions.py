@@ -11,3 +11,12 @@ class GroupNotCreatedError(AUTHBaseException):
         else:
             super().__init__(msg)
         logging.error(self.msg)
+
+
+class MemberNotAddedError(AUTHBaseException):
+    def __init__(self, msg: Optional[str] = None):
+        if not msg:
+            self.msg = "Members not added"
+        else:
+            super().__init__(msg)
+        logging.error(self.msg)
