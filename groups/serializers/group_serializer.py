@@ -2,7 +2,6 @@ from typing import Optional, List
 
 from rest_framework import serializers
 
-from auth_api.auth_exceptions.user_exceptions import UserNotFoundError
 from auth_api.export_types.validation_types.validation_result import ValidationResult
 from auth_api.models.user_models.user import User
 from auth_api.services.helpers import validate_user_email
@@ -42,14 +41,8 @@ class GroupSerializer(serializers.ModelSerializer):
                     is_validated_email = validation_result_email.is_validated
                     if not is_validated_email:
                         raise serializers.ValidationError(
-                            detail=validation_result_email.error
+                            detail=f"{member_email} does not exist."
                         )
-
-                # check if the member is a valid user
-                if not User.objects.filter(email=member_email).exists():
-                    raise UserNotFoundError(
-                        msg=f"User '{member_email}' does not exist."
-                    )
 
                 # check if the member is a friend
                 if not Friend.objects.filter(
@@ -72,22 +65,13 @@ class GroupSerializer(serializers.ModelSerializer):
         image = request.image
 
         if self.validate(data):
-            list_members: List[User] = []
+            list_members: List[User] = [creator]
 
-            if not members:
-                list_members.append(creator)
-            else:
+            if members and len(members) > 0:
                 for member_email in members:
-                    user_friends: User = User.objects.get(email=member_email)
-                    list_members.append(user_friends)
-
-            if creator not in list_members:
-                list_members.insert(0, creator)
+                    list_members.append(User.objects.get(email=member_email))
 
             group = Group.objects.create(name=name, image=image, creator=creator)
-
             group.members.set(list_members)
 
-            if group:
-                group.save()
-                return group
+            return group
