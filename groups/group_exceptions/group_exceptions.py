@@ -25,7 +25,7 @@ class MemberNotAddedError(AUTHBaseException):
 class GroupNotFoundError(AUTHBaseException):
     def __init__(self, msg: Optional[str] = None):
         if not msg:
-            self.msg = "Group cant found error"
+            self.msg = "Group does not exists."
         else:
             super().__init__(msg)
         logging.error(self.msg)
