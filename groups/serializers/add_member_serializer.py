@@ -1,15 +1,20 @@
-from typing import Optional, List
+from typing import Optional
 
 from rest_framework import serializers
 
+from auth_api.auth_exceptions.user_exceptions import UserNotFoundError
 from auth_api.export_types.validation_types.validation_result import ValidationResult
 from auth_api.models.user_models.user import User
 from auth_api.services.helpers import validate_user_email
 from friends.friend_exceptions.friend_exceptions import FriendNotFoundError
 from friends.models.friend import Friend
 from groups.export_types.add_member import AddMemberRequestType
-from groups.export_types.create_group import CreateGroupRequestType
+from groups.group_exceptions.group_exceptions import (
+    GroupNotFoundError,
+    UserAlreadyInGroupError,
+)
 from groups.models.group import Group
+from groups.services.group_helpers import validate_group_uid
 
 
 class AddMemberSerializer(serializers.ModelSerializer):
@@ -24,56 +29,43 @@ class AddMemberSerializer(serializers.ModelSerializer):
         group_id = request.group_id
         user_email = request.user_email
 
-        # if name and Group.objects.filter(name=name, creator_id=uid).exists():
-        #     raise ValueError(f"A group with the name '{name}' already exists.")
-        #
-        # if members:
-        #     for member_email in members:
-        #
-        #         # check if the member is a valid email
-        #         if (
-        #             member_email
-        #             and member_email != ""
-        #             and isinstance(member_email, str)
-        #         ):
-        #             validation_result_email: ValidationResult = validate_user_email(
-        #                 member_email
-        #             )
-        #             is_validated_email = validation_result_email.is_validated
-        #             if not is_validated_email:
-        #                 raise serializers.ValidationError(
-        #                     detail=f"{member_email} does not exist."
-        #                 )
-        #
-        #         # check if the member is a friend
-        #         if not Friend.objects.filter(
-        #             user2__id=uid, user1__id=User.objects.get(email=member_email).id
-        #         ).exists():
-        #             raise FriendNotFoundError(
-        #                 msg=f"'{member_email}' is not your friend."
-        #             )
+        if user_email:
+            validation_result_email: ValidationResult = validate_user_email(user_email)
+            is_validated_email = validation_result_email.is_validated
+            if not is_validated_email:
+                raise UserNotFoundError(msg="This user is not registered with us.")
+            if (
+                not Friend.objects.filter(
+                    user2__id=uid, user1__id=User.objects.get(email=user_email).id
+                ).exists()
+                and not Friend.objects.filter(
+                    user2__id=User.objects.get(email=user_email).id, user1__id=uid
+                ).exists()
+            ):
+                raise FriendNotFoundError(msg=f"'{user_email}' is not your friend.")
+
+        if group_id:
+            if not validate_group_uid(group_uid=group_id).is_validated:
+                raise GroupNotFoundError()
+
+            group: Group = Group.objects.get(id=group_id)
+            user: User = User.objects.get(email=user_email)
+
+            if group.members.get(id=user.id):
+                raise UserAlreadyInGroupError()
 
         return True
 
     def create(self, data: dict) -> User:
         request: AddMemberRequestType = data.get("request_data")
-        uid: str = data.get("uid")
-
-        creator: User = User.objects.get(id=uid)
 
         user_email: str = request.user_email
         group_id: str = request.group_id
 
-        group: Group = Group.objects.filter(id=group_id).first()
-
         if self.validate(data):
-            # list_members: List[User] = [creator]
-            #
-            # if members and len(members) > 0:
-            #     for member_email in members:
-            #         list_members.append(User.objects.get(email=member_email))
-            #
-            # group = Group.objects.create(name=name, image=image, creator=creator)
-            # group.members.set(list_members)
+            group: Group = Group.objects.get(id=group_id)
+            user: User = User.objects.get(email=user_email)
 
-            return creator
+            group.members.add(user)
+
+            return user

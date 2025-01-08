@@ -16,6 +16,10 @@ from auth_api.auth_exceptions.user_exceptions import (
     PasswordNotMatchError,
 )
 from friends.friend_exceptions.friend_exceptions import FriendNotFoundError
+from groups.group_exceptions.group_exceptions import (
+    GroupNotFoundError,
+    UserAlreadyInGroupError,
+)
 
 
 class ExceptionHandler:
@@ -79,6 +83,14 @@ class ExceptionHandler:
             },
             FriendNotFoundError: {
                 "message": "FriendNotFoundError",
+                "status": status.HTTP_400_BAD_REQUEST,
+            },
+            GroupNotFoundError: {
+                "message": "GroupNotFoundError",
+                "status": status.HTTP_400_BAD_REQUEST,
+            },
+            UserAlreadyInGroupError: {
+                "message": "UserAlreadyInGroupError",
                 "status": status.HTTP_400_BAD_REQUEST,
             },
             # Exception: {
