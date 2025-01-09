@@ -22,7 +22,7 @@ class UpdateGroupView(APIView):
                 )
                 return Response(
                     data={
-                        "message": "Group updated Successfully.",
+                        "message": "Group updated successfully.",
                     },
                     status=status.HTTP_200_OK,
                     content_type="application/json",
