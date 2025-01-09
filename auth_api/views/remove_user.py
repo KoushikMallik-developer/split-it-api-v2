@@ -30,8 +30,7 @@ class RemoveUserView(APIView):
                     User.objects.get(email=email).delete()
                     return Response(
                         data={
-                            "successMessage": "User removed Successfully.",
-                            "errorMessage": None,
+                            "message": "User removed Successfully.",
                         },
                         status=status.HTTP_200_OK,
                         content_type="application/json",

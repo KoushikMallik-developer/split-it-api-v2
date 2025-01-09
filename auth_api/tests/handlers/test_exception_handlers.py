@@ -18,7 +18,7 @@ class TestExceptionHandler:
         exception = UserNotFoundError("User not found")
         response = handler.handle_exception(exception)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data["errorMessage"] == "UserNotFoundError: User not found"
+        assert response.data["message"] == "UserNotFoundError: User not found"
 
     def test_handle_exception_user_already_verified(self):
         handler = ExceptionHandler()
@@ -26,7 +26,7 @@ class TestExceptionHandler:
         response = handler.handle_exception(exception)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert (
-            response.data["errorMessage"]
+            response.data["message"]
             == "UserAlreadyVerifiedError: User already verified"
         )
 
@@ -35,23 +35,21 @@ class TestExceptionHandler:
         exception = UserNotVerifiedError("User not verified")
         response = handler.handle_exception(exception)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert (
-            response.data["errorMessage"] == "UserNotVerifiedError: User not verified"
-        )
+        assert response.data["message"] == "UserNotVerifiedError: User not verified"
 
     def test_handle_exception_email_not_sent(self):
         handler = ExceptionHandler()
         exception = EmailNotSentError("Email not sent")
         response = handler.handle_exception(exception)
         assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
-        assert response.data["errorMessage"] == "EmailNotSentError: Email not sent"
+        assert response.data["message"] == "EmailNotSentError: Email not sent"
 
     def test_handle_exception_otp_not_verified(self):
         handler = ExceptionHandler()
         exception = OTPNotVerifiedError("OTP not verified")
         response = handler.handle_exception(exception)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data["errorMessage"] == "OTPNotVerifiedError: OTP not verified"
+        assert response.data["message"] == "OTPNotVerifiedError: OTP not verified"
 
     def test_handle_exception_user_authentication_failed(self):
         handler = ExceptionHandler()
@@ -59,7 +57,7 @@ class TestExceptionHandler:
         response = handler.handle_exception(exception)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert (
-            response.data["errorMessage"]
+            response.data["message"]
             == "UserAuthenticationFailedError: Password is invalid"
         )
 
@@ -69,6 +67,6 @@ class TestExceptionHandler:
         response = handler.handle_exception(exception)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert (
-            response.data["errorMessage"]
+            response.data["message"]
             == "UserNotAuthenticatedError: User not authenticated"
         )

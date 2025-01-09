@@ -18,8 +18,7 @@ class TestRemoveUserView:
         response = api_client.post(self.url, data, headers=headers, format="json")
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data["successMessage"] == "User removed Successfully."
-        assert response.data["errorMessage"] is None
+        assert response.data["message"] == "User removed Successfully."
 
         with pytest.raises(User.DoesNotExist):
             User.objects.get(email="koushikmallik001@gmail.com")
@@ -34,10 +33,9 @@ class TestRemoveUserView:
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert (
-            response.data["errorMessage"]
+            response.data["message"]
             == "UserNotFoundError: This user is not registered. Please register as new user."
         )
-        assert response.data["successMessage"] is None
 
     def test_remove_user_missing_email(self, api_client: APIClient, access_token: str):
         data = {}
@@ -48,8 +46,7 @@ class TestRemoveUserView:
         response = api_client.post(self.url, data, headers=headers, format="json")
 
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-        assert response.data["errorMessage"] == "ValueError: Email is required."
-        assert response.data["successMessage"] is None
+        assert response.data["message"] == "ValueError: Email is required."
 
     def test_remove_user_unauthorized(self, api_client: APIClient):
         data = {"email": "koushikmallik001@gmail.com"}
@@ -60,7 +57,6 @@ class TestRemoveUserView:
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert (
-            response.data["errorMessage"]
+            response.data["message"]
             == "UserNotAuthenticatedError: The user is not authenticated, please re-login."
         )
-        assert response.data["successMessage"] is None

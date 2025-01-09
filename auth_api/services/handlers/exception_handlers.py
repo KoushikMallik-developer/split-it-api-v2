@@ -100,8 +100,7 @@ class ExceptionHandler:
                     e.msg = "; ".join([error for error in e.detail])
                 return Response(
                     data={
-                        "successMessage": None,
-                        "errorMessage": (
+                        "message": (
                             f"{handler['message']}: {e.msg}"
                             if hasattr(e, "msg")
                             else f"{handler['message']}: {str(e)}"

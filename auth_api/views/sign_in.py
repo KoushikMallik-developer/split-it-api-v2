@@ -23,7 +23,7 @@ class SignInView(APIView):
                 )
                 if result.get("token"):
                     return Response(
-                        data={"token": result.get("token"), "errorMessage": None},
+                        data={"token": result.get("token"), "message": None},
                         status=status.HTTP_200_OK,
                         content_type="application/json",
                     )

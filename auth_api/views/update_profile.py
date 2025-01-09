@@ -25,8 +25,7 @@ class UpdateProfileView(APIView):
                 )
                 return Response(
                     data={
-                        "successMessage": "User details updated Successfully.",
-                        "errorMessage": None,
+                        "message": "User details updated Successfully.",
                     },
                     status=status.HTTP_200_OK,
                     content_type="application/json",

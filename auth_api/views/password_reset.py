@@ -20,8 +20,7 @@ class PasswordResetView(APIView):
                 result = UserServices().reset_password(email=email)
                 return Response(
                     data={
-                        "successMessage": result.get("successMessage"),
-                        "errorMessage": None,
+                        "message": result.get("successMessage"),
                     },
                     status=status.HTTP_200_OK,
                     content_type="application/json",

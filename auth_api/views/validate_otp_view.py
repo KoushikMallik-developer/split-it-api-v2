@@ -19,7 +19,7 @@ class ValidateOTPView(APIView):
             return Response(
                 data={
                     "token": token,
-                    "errorMessage": None,
+                    "message": None,
                 },
                 status=status.HTTP_200_OK,
                 content_type="application/json",
