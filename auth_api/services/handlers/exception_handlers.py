@@ -20,6 +20,7 @@ from groups.group_exceptions.group_exceptions import (
     GroupNotFoundError,
     UserAlreadyInGroupError,
     MemberNotAddedError,
+    NotAnGroupAdminError,
 )
 
 
@@ -96,6 +97,10 @@ class ExceptionHandler:
             },
             MemberNotAddedError: {
                 "message": "MemberNotAddedError",
+                "status": status.HTTP_400_BAD_REQUEST,
+            },
+            NotAnGroupAdminError: {
+                "message": "NotAnGroupAdminError",
                 "status": status.HTTP_400_BAD_REQUEST,
             },
             # Exception: {

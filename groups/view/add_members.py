@@ -23,10 +23,7 @@ class AddMemberView(APIView):
                 )
                 if result.get("successMessage"):
                     return Response(
-                        data={
-                            "successMessage": result.get("successMessage"),
-                            "errorMessage": None,
-                        },
+                        data={"message": result.get("successMessage")},
                         status=status.HTTP_201_CREATED,
                         content_type="application/json",
                     )
