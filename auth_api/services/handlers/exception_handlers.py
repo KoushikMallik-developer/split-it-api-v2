@@ -19,6 +19,7 @@ from friends.friend_exceptions.friend_exceptions import FriendNotFoundError
 from groups.group_exceptions.group_exceptions import (
     GroupNotFoundError,
     UserAlreadyInGroupError,
+    MemberNotAddedError,
 )
 
 
@@ -91,6 +92,10 @@ class ExceptionHandler:
             },
             UserAlreadyInGroupError: {
                 "message": "UserAlreadyInGroupError",
+                "status": status.HTTP_400_BAD_REQUEST,
+            },
+            MemberNotAddedError: {
+                "message": "MemberNotAddedError",
                 "status": status.HTTP_400_BAD_REQUEST,
             },
             # Exception: {
