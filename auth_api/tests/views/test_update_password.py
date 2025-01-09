@@ -20,8 +20,7 @@ class TestUpdatePasswordView:
         response = api_client.post(self.url, data, headers=headers, format="json")
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data["successMessage"] == "Password updated successfully."
-        assert response.data["errorMessage"] is None
+        assert response.data["message"] == "Password updated successfully."
 
     def test_update_password_unauthorized(self, api_client: APIClient):
         data = {
@@ -32,10 +31,9 @@ class TestUpdatePasswordView:
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert (
-            response.data["errorMessage"]
+            response.data["message"]
             == "UserNotAuthenticatedError: The user is not authenticated, please re-login."
         )
-        assert response.data["successMessage"] is None
 
     @pytest.mark.usefixtures("create_test_user")
     def test_update_password_not_matching(
@@ -53,10 +51,9 @@ class TestUpdatePasswordView:
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert (
-            response.data["errorMessage"]
+            response.data["message"]
             == "PasswordNotMatchError: Passwords are not matching or not in correct format."
         )
-        assert response.data["successMessage"] is None
 
     @pytest.mark.usefixtures("create_test_user")
     def test_update_password_invalid_data(
@@ -73,7 +70,5 @@ class TestUpdatePasswordView:
 
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
         assert (
-            response.data["errorMessage"]
-            == "ValueError: Please provide both the passwords."
+            response.data["message"] == "ValueError: Please provide both the passwords."
         )
-        assert response.data["successMessage"] is None

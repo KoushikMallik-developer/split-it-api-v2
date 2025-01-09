@@ -19,8 +19,7 @@ class CreateUsersView(APIView):
             if result.get("successMessage"):
                 return Response(
                     data={
-                        "successMessage": result.get("successMessage"),
-                        "errorMessage": None,
+                        "message": result.get("successMessage"),
                     },
                     status=status.HTTP_201_CREATED,
                     content_type="application/json",

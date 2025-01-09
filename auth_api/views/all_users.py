@@ -18,8 +18,7 @@ class AllUsersView(APIView):
                 return Response(
                     data={
                         "data": all_user_details.model_dump(),
-                        "successMessage": None,
-                        "errorMessage": None,
+                        "message": None,
                     },
                     status=status.HTTP_200_OK,
                     content_type="application/json",
@@ -28,8 +27,7 @@ class AllUsersView(APIView):
                 return Response(
                     data={
                         "data": {"user_list": []},
-                        "successMessage": "No User found in database.",
-                        "errorMessage": None,
+                        "message": "No User found in database.",
                     },
                     status=status.HTTP_200_OK,
                     content_type="application/json",

@@ -24,7 +24,7 @@ class TestVerifyOTPView:
             assert isinstance(response.data["token"], dict)
             assert response.data["token"]["access"]
             assert isinstance(response.data["token"]["access"], str)
-            assert response.data["errorMessage"] is None
+            assert response.data["message"] is None
 
     def test_verify_otp_failure_with_invalid_email(self, api_client: APIClient):
         with patch.object(OTPServices, "verify_otp", return_value=False):
@@ -33,7 +33,7 @@ class TestVerifyOTPView:
 
             assert response.status_code == status.HTTP_400_BAD_REQUEST
             assert (
-                response.data["errorMessage"]
+                response.data["message"]
                 == "UserNotFoundError: This user is not registered. Please register as new user."
             )
 
@@ -44,7 +44,4 @@ class TestVerifyOTPView:
             response = api_client.post(self.url, data, format="json")
 
             assert response.status_code == status.HTTP_400_BAD_REQUEST
-            assert (
-                response.data["errorMessage"]
-                == "OTPNotVerifiedError: OTP did not match."
-            )
+            assert response.data["message"] == "OTPNotVerifiedError: OTP did not match."

@@ -18,7 +18,7 @@ class TestUserDetailsView:
         response = api_client.get(self.url, headers=headers)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data["successMessage"] == "User details fetched successfully."
+        assert response.data["message"] == "User details fetched successfully."
 
         assert response.data["data"]["email"]
         assert isinstance(response.data["data"]["email"], str)
@@ -52,10 +52,7 @@ class TestUserDetailsView:
         response = api_client.get(self.url, headers=headers)
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
-        assert (
-            response.data["errorMessage"] == "TokenError: Token is invalid or expired"
-        )
-        assert response.data["successMessage"] is None
+        assert response.data["message"] == "TokenError: Token is invalid or expired"
 
     def test_user_details_unauthorized(self, api_client: APIClient):
         headers = {
@@ -65,7 +62,6 @@ class TestUserDetailsView:
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert (
-            response.data["errorMessage"]
+            response.data["message"]
             == "UserNotAuthenticatedError: The user is not authenticated, please re-login."
         )
-        assert response.data["successMessage"] is None

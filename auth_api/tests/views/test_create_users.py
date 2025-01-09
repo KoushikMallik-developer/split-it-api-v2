@@ -20,8 +20,7 @@ class TestCreateUsersView:
         response = client.post(self.url, data, format="json")
 
         assert response.status_code == status.HTTP_201_CREATED
-        assert response.data["successMessage"] == DEFAULT_VERIFICATION_MESSAGE
-        assert response.data["errorMessage"] is None
+        assert response.data["message"] == DEFAULT_VERIFICATION_MESSAGE
 
         user = User.objects.get(email="testuser@example.com")
         assert user.fname == "Test"
@@ -33,8 +32,7 @@ class TestCreateUsersView:
         response = client.post(self.url, data, format="json")
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data["successMessage"] is None
-        assert "errorMessage" in response.data
+        assert "message" in response.data
 
     def test_create_user_missing_email_fields(self):
         client = APIClient()
@@ -42,8 +40,7 @@ class TestCreateUsersView:
         response = client.post(self.url, data, format="json")
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data["successMessage"] is None
-        assert "errorMessage" in response.data
+        assert "message" in response.data
 
     def test_create_user_missing_password_fields(self):
         client = APIClient()
@@ -51,8 +48,7 @@ class TestCreateUsersView:
         response = client.post(self.url, data, format="json")
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data["successMessage"] is None
-        assert "errorMessage" in response.data
+        assert "message" in response.data
 
     def test_create_user_invalid_email(self):
         client = APIClient()
@@ -68,8 +64,7 @@ class TestCreateUsersView:
         response = client.post(self.url, data, format="json")
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data["successMessage"] is None
-        assert "errorMessage" in response.data
+        assert "message" in response.data
 
     def test_create_user_duplicate_email(self):
         client = APIClient()
@@ -89,5 +84,4 @@ class TestCreateUsersView:
         )  # Attempt to create a duplicate user
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data["successMessage"] is None
-        assert "errorMessage" in response.data
+        assert "message" in response.data

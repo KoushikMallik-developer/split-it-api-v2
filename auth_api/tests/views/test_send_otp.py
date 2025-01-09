@@ -21,10 +21,9 @@ class TestSendOTPView:
 
             assert response.status_code == status.HTTP_200_OK
             assert (
-                response.data["successMessage"]
+                response.data["message"]
                 == "Verification Email has been sent successfully to the user. Please verify your email to access the account."
             )
-            assert response.data["errorMessage"] is None
 
     def test_send_otp_user_already_verified(self):
         User.objects.create(email="testuser@example.com", is_active=True)
@@ -35,10 +34,9 @@ class TestSendOTPView:
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert (
-            response.data["errorMessage"]
+            response.data["message"]
             == "UserAlreadyVerifiedError: This user is already verified."
         )
-        assert response.data["successMessage"] is None
 
     def test_send_otp_email_not_sent(self):
         User.objects.create(email="testuser@example.com", is_active=False)
@@ -50,10 +48,9 @@ class TestSendOTPView:
 
             assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
             assert (
-                response.data["errorMessage"]
+                response.data["message"]
                 == "EmailNotSentError: Verification Email could not be sent."
             )
-            assert response.data["successMessage"] is None
 
     def test_send_otp_user_not_found(self):
         client = APIClient()
@@ -62,10 +59,9 @@ class TestSendOTPView:
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert (
-            response.data["errorMessage"]
+            response.data["message"]
             == "UserNotFoundError: This user is not registered. Please register as new user."
         )
-        assert response.data["successMessage"] is None
 
     def test_send_otp_value_error(self):
         client = APIClient()
@@ -74,7 +70,6 @@ class TestSendOTPView:
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert (
-            response.data["errorMessage"]
+            response.data["message"]
             == "UserNotFoundError: This user is not registered. Please register as new user."
         )
-        assert response.data["successMessage"] is None

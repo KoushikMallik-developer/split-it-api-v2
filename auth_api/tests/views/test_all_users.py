@@ -16,9 +16,8 @@ class TestAllUsersView:
         response_data = response.data
 
         assert "data" in response_data
-        assert "successMessage" in response_data
-        assert "errorMessage" in response_data
-        assert not response_data["errorMessage"]
+        assert "message" in response_data
+        assert not response_data["message"]
         assert isinstance(response_data["data"], dict)
 
         assert "user_list" in response_data["data"]

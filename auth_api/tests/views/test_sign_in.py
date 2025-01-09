@@ -49,5 +49,5 @@ class TestSignInView:
             assert response.get("token")
             assert isinstance(response.get("token"), dict)
         else:
-            assert response.get("errorMessage")
-            assert response.get("errorMessage") == expected
+            assert response.get("message")
+            assert response.get("message") == expected
