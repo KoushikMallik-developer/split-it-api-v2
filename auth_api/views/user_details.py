@@ -18,9 +18,8 @@ class UserDetailView(APIView):
                 user_details = UserServices().get_user_details(uid=user_id)
                 return Response(
                     data={
-                        "successMessage": "User details fetched successfully.",
+                        "message": "User details fetched successfully.",
                         "data": user_details.model_dump(),
-                        "errorMessage": None,
                     },
                     status=status.HTTP_200_OK,
                     content_type="application/json",

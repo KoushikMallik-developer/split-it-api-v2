@@ -27,8 +27,7 @@ class TestUpdateProfileView:
         response = api_client.post(self.url, data, headers=headers, format="json")
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data["successMessage"] == "User details updated Successfully."
-        assert response.data["errorMessage"] is None
+        assert response.data["message"] == "User details updated Successfully."
 
         user = User.objects.get(email="koushikmallik001@gmail.com")
         assert user.fname == "NewFirstName"
@@ -44,10 +43,9 @@ class TestUpdateProfileView:
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert (
-            response.data["errorMessage"]
+            response.data["message"]
             == "UserNotAuthenticatedError: The user is not authenticated, please re-login."
         )
-        assert response.data["successMessage"] is None
 
     @pytest.mark.usefixtures("create_test_user")
     def test_update_profile_invalid_data(
@@ -65,7 +63,6 @@ class TestUpdateProfileView:
 
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
         assert (
-            response.data["errorMessage"]
+            response.data["message"]
             == "ValueError: First name is not in correct format."
         )
-        assert response.data["successMessage"] is None
