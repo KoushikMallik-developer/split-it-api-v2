@@ -45,9 +45,14 @@ class GroupSerializer(serializers.ModelSerializer):
                         )
 
                 # check if the member is a friend
-                if not Friend.objects.filter(
-                    user2__id=uid, user1__id=User.objects.get(email=member_email).id
-                ).exists():
+                if (
+                    not Friend.objects.filter(
+                        user2__id=uid, user1__email=member_email
+                    ).exists()
+                    and not Friend.objects.filter(
+                        user2__email=member_email, user1__id=uid
+                    ).exists()
+                ):
                     raise FriendNotFoundError(
                         msg=f"'{member_email}' is not your friend."
                     )
