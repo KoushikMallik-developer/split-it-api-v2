@@ -1,5 +1,7 @@
 import os
 from typing import Optional
+
+from django.db.models import Q
 from dotenv import load_dotenv
 from psycopg2 import DatabaseError
 
@@ -20,6 +22,7 @@ from auth_api.export_types.request_data_types.update_user_profile import (
 )
 from auth_api.export_types.request_data_types.verify_otp import VerifyOTPRequestType
 from auth_api.export_types.user_types.export_user import ExportUserList, ExportUser
+from auth_api.export_types.user_types.search_user import SearchUserRequestType
 from auth_api.models.user_models.user import User
 from auth_api.serializers.user_serializer import UserSerializer
 from auth_api.services.definitions import DEFAULT_VERIFICATION_MESSAGE
@@ -32,6 +35,7 @@ from auth_api.services.helpers import (
     validate_dob,
     validate_phone,
     validate_password_for_password_change,
+    validate_email_format,
 )
 from auth_api.services.otp_services.otp_services import OTPServices
 from auth_api.services.token_services.token_generator import TokenGenerator
@@ -53,6 +57,31 @@ class UserServices:
             return all_user_details
         else:
             return None
+
+    @staticmethod
+    def get_searched_users(
+        request_data: SearchUserRequestType,
+    ) -> Optional[ExportUserList]:
+        users = []
+        if validate_email_format(request_data.keyword):
+            users = User.objects.filter(email=request_data.keyword)
+        else:
+            keywords = request_data.keyword.split(" ")
+
+            search_keywords = [request_data.keyword] + keywords
+
+            query = Q()
+            for keyword in search_keywords:
+                query |= Q(fname__icontains=keyword) | Q(lname__icontains=keyword)
+
+            users = User.objects.filter(query)
+        all_user_details = []
+        for user in users:
+            export_user = ExportUser(with_id=False, **user.model_to_dict())
+            all_user_details.append(export_user)
+
+        all_user_details = ExportUserList(user_list=all_user_details)
+        return all_user_details
 
     @staticmethod
     def create_new_user_service(request_data: CreateUserRequestType) -> dict:
