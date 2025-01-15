@@ -4,6 +4,7 @@ from auth_api.views.all_users import AllUsersView
 from auth_api.views.create_user import CreateUsersView
 from auth_api.views.otp_view import SendOTPView
 from auth_api.views.password_reset import PasswordResetView
+from auth_api.views.refresh_token import RefreshTokenView
 from auth_api.views.remove_user import RemoveUserView
 from auth_api.views.sign_in import SignInView
 from auth_api.views.update_password import UpdatePasswordView
@@ -26,5 +27,6 @@ urlpatterns = [
         name="send-reset-password-email",
     ),
     path("update-password", UpdatePasswordView.as_view(), name="Change-User-Password"),
+    path("refresh-token", RefreshTokenView.as_view(), name="refresh-token"),
     # path("clear-caches", ClearServerCaches.as_view(), name="clear-caches"),
 ]
