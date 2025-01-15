@@ -27,3 +27,6 @@ class ExportUser(BaseModel):
 
 class ExportUserList(BaseModel):
     user_list: typing.List[ExportUser]
+
+    def to_dict(self):
+        return [user.dict() for user in self.user_list]
