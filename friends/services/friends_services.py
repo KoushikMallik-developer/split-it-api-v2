@@ -3,7 +3,6 @@ from typing import Optional
 from django.db.models import Q
 from psycopg2 import DatabaseError
 
-from auth_api.services.helpers import validate_email_format
 from friends.export_types.friend_types.export_friend import (
     ExportFriendList,
     ExportFriend,
@@ -61,7 +60,7 @@ class UseFriendServices:
 
     @staticmethod
     def get_searched_friends(
-            request_data: SearchFriendRequestType, user_id: str
+        request_data: SearchFriendRequestType, user_id: str
     ) -> Optional[ExportFriendList]:
         keywords = request_data.keyword.split(" ")
 
@@ -70,12 +69,12 @@ class UseFriendServices:
         query = Q()
         for keyword in search_keywords:
             query |= (
-                    Q(user1__fname__icontains=keyword)
-                    | Q(user1__lname__icontains=keyword)
-                    | Q(user1__email__icontains=keyword)
-                    | Q(user2__fname__icontains=keyword)
-                    | Q(user2__lname__icontains=keyword)
-                    | Q(user2__email__icontains=keyword)
+                Q(user1__fname__icontains=keyword)
+                | Q(user1__lname__icontains=keyword)
+                | Q(user1__email__icontains=keyword)
+                | Q(user2__fname__icontains=keyword)
+                | Q(user2__lname__icontains=keyword)
+                | Q(user2__email__icontains=keyword)
             )
         friends = Friend.objects.filter(query)
 
@@ -143,7 +142,7 @@ class UseFriendServices:
 
     @staticmethod
     def create_new_friend_request_service(
-            request_data: AddFriendRequestType, uid: str
+        request_data: AddFriendRequestType, uid: str
     ) -> dict:
         data: dict = {
             "sender": uid,
@@ -160,7 +159,7 @@ class UseFriendServices:
 
     @staticmethod
     def accept_friend_request_service(
-            request_data: AcceptFriendRequestType, uid: str
+        request_data: AcceptFriendRequestType, uid: str
     ) -> dict:
         data: dict = {
             "receiver": uid,
@@ -187,7 +186,7 @@ class UseFriendServices:
 
     @staticmethod
     def remove_friend_request_service(
-            request_data: RemoveFriendRequestType, uid: str
+        request_data: RemoveFriendRequestType, uid: str
     ) -> dict:
         data: dict = {
             "primary_user_id": uid,
