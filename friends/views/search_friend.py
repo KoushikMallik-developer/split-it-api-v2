@@ -31,9 +31,9 @@ class SearchFriendView(APIView):
                             else []
                         ),
                         "message": (
-                            "Friends are fetched"
+                            "Search result fetched"
                             if searched_friends is not None
-                            else "No friends found"
+                            else "No result found"
                         ),
                     },
                     status=status.HTTP_200_OK,

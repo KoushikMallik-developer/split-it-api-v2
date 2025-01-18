@@ -71,10 +71,8 @@ class UseFriendServices:
             query |= (
                 Q(user1__fname__icontains=keyword)
                 | Q(user1__lname__icontains=keyword)
-                | Q(user1__email__icontains=keyword)
                 | Q(user2__fname__icontains=keyword)
                 | Q(user2__lname__icontains=keyword)
-                | Q(user2__email__icontains=keyword)
             )
         friends = Friend.objects.filter(query)
 
