@@ -149,7 +149,9 @@ class UserServices:
             raise ValueError("Please provide both the passwords.")
 
     @staticmethod
-    def update_user_profile(uid: str, request_data: UpdateUserProfileRequestType):
+    def update_user_profile(
+        uid: str, request_data: UpdateUserProfileRequestType
+    ) -> ExportUser:
         user = User.objects.get(id=uid)
         if (
             request_data.image
@@ -200,6 +202,7 @@ class UserServices:
             else:
                 raise ValueError(validate_phone(phone=request_data.phone).error)
         user.save()
+        return ExportUser(**user.model_to_dict())
 
     @staticmethod
     def get_user_details(uid: str) -> ExportUser:
