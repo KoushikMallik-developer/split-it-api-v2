@@ -20,6 +20,9 @@ from friends.export_types.request_data_types.remove_friend import RemoveFriendTy
 from friends.export_types.request_data_types.remove_friend_requeset import (
     RemoveFriendRequestType,
 )
+from friends.export_types.request_data_types.search_friend import (
+    SearchFriendRequestType,
+)
 from friends.friend_exceptions.friend_exceptions import (
     FriendRequestNotSentError,
     FriendRequestNotAcceptedError,
@@ -52,6 +55,30 @@ class UseFriendServices:
                 friend_list=all_friend, user_id=user_id
             )
             return all_friend_details
+        else:
+            return None
+
+    @staticmethod
+    def get_searched_friends(
+        request_data: SearchFriendRequestType, user_id: str
+    ) -> Optional[ExportFriendList]:
+        keywords = request_data.keyword.split(" ")
+
+        search_keywords = [request_data.keyword] + keywords
+
+        query = Q()
+        for keyword in search_keywords:
+            query |= (
+                Q(user1__fname__icontains=keyword)
+                | Q(user1__lname__icontains=keyword)
+                | Q(user2__fname__icontains=keyword)
+                | Q(user2__lname__icontains=keyword)
+            )
+        friends = Friend.objects.filter(query)
+
+        if friends:
+            all_friend = [ExportFriend(**friend.model_to_dict()) for friend in friends]
+            return ExportFriendList(friend_list=all_friend, user_id=user_id)
         else:
             return None
 

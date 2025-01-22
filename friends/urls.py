@@ -8,6 +8,7 @@ from friends.views.my_sent_friend_requests import MySentFriendRequestsView
 from friends.views.add_friend import AddFriend
 from friends.views.remove_friend import RemoveFriendView
 from friends.views.remove_friend_request import RemoveFriendRequest
+from friends.views.search_friend import SearchFriendView
 
 urlpatterns = [
     path("my-friends", AllFriendsView.as_view(), name="All-Friends"),
@@ -45,5 +46,10 @@ urlpatterns = [
         "remove-friend-request",
         RemoveFriendRequest.as_view(),
         name="Remove-Friend-Request",
+    ),
+    path(
+        "search-friend",
+        SearchFriendView.as_view(),
+        name="Search-Friend",
     ),
 ]
