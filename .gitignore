@@ -162,3 +162,7 @@ cython_debug/
 #.idea/
 
 clean.bat
+/groups/migrations/
+/friends/migrations/
+/auth_api/migrations/
+/e_app/migrations/
