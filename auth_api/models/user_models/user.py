@@ -1,3 +1,5 @@
+from django.db import models
+
 from auth_api.auth_exceptions.user_exceptions import (
     UserNotVerifiedError,
     UserAuthenticationFailedError,
@@ -11,6 +13,8 @@ from auth_api.services.token_services.token_generator import TokenGenerator
 
 
 class User(AbstractUser):
+    friends = models.ManyToManyField("self", symmetrical=False, blank=True)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

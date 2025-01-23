@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 
 from auth_api.services.handlers.exception_handlers import ExceptionHandler
 from auth_api.services.helpers import decode_jwt_token, validate_user_uid
-from groups.export_types.add_member import AddMemberRequestType
+from groups.export_types.request_data_type.add_member import AddMemberRequestType
 from groups.services.group_services import GroupServices
 
 
@@ -21,11 +21,13 @@ class AddMemberView(APIView):
                 result = GroupServices.add_member_group_service(
                     request_data=AddMemberRequestType(**request.data), uid=user_id
                 )
-                if result.get("successMessage"):
-                    return Response(
-                        data={"message": result.get("successMessage")},
-                        status=status.HTTP_201_CREATED,
-                        content_type="application/json",
-                    )
+                return Response(
+                    data={
+                        "message": result.get("message"),
+                        "data": result.get("data"),
+                    },
+                    status=status.HTTP_201_CREATED,
+                    content_type="application/json",
+                )
         except Exception as e:
             return ExceptionHandler().handle_exception(e)

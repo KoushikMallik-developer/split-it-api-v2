@@ -1,6 +1,4 @@
 from typing import Optional
-
-from django.db.models import Q
 from rest_framework import serializers
 
 from auth_api.auth_exceptions.user_exceptions import (
@@ -15,7 +13,6 @@ from friends.friend_exceptions.friend_exceptions import (
     AlreadyFriendRequestSentError,
     AlreadyAFriendError,
 )
-from friends.models.friend import Friend
 from friends.models.friend_request import FriendRequest
 
 
@@ -34,8 +31,7 @@ class FriendRequestSerializer(serializers.ModelSerializer):
             validation_result_email: ValidationResult = validate_user_email(
                 data.get("receiver")
             )
-            is_validated_email = validation_result_email.is_validated
-            if not is_validated_email:
+            if not validation_result_email.is_validated:
                 raise UserNotFoundError(msg="This user is not registered with us.")
         else:
             raise ValueError("user_email is required.")
@@ -55,10 +51,10 @@ class FriendRequestSerializer(serializers.ModelSerializer):
             raise AlreadyFriendRequestSentError()
 
         # Check if the user is already friends with the same user.
-        already_a_friend: bool = Friend.objects.filter(
-            Q(user1__id=sender.id, user2__id=receiver.id)
-            | Q(user1__id=receiver.id, user2__id=sender.id)
-        ).exists()
+        already_a_friend: bool = (
+            sender.friends.filter(id=receiver.id).exists()
+            or receiver.friends.filter(id=sender.id).exists()
+        )
         if already_a_friend:
             raise AlreadyAFriendError()
 

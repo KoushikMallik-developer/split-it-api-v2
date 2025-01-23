@@ -1,11 +1,12 @@
-from auth_api.models.user_models.user import User
-from groups.export_types.add_member import AddMemberRequestType
-from groups.export_types.create_group import CreateGroupRequestType
-from groups.export_types.update_group import UpdateGroupRequestType
+from django.core.exceptions import ObjectDoesNotExist
+from groups.export_types.group_types.export_group import ExportGroup
+from groups.export_types.request_data_type.add_member import AddMemberRequestType
+from groups.export_types.request_data_type.create_group import CreateGroupRequestType
+from groups.export_types.request_data_type.update_group import UpdateGroupRequestType
 from groups.group_exceptions.group_exceptions import (
     MemberNotAddedError,
     NotAnGroupAdminError,
-    GroupUpdateFailure,
+    GroupUpdateFailed,
     GroupNotFoundError,
 )
 from groups.models.group import Group
@@ -20,43 +21,45 @@ class GroupServices:
     ) -> dict:
         data: dict = {"request_data": request_data, "uid": uid}
         group: Group = GroupSerializer().create(data)
-        print(f"Group {group.id} is created")
         return {
-            "successMessage": f"Group {group.name} is created",
-            "errorMessage": None,
+            "message": f"Group {group.name} is created",
+            "data": ExportGroup(**group.model_to_dict()).model_dump(),
         }
 
     @staticmethod
     def add_member_group_service(request_data: AddMemberRequestType, uid: str) -> dict:
         data: dict = {"request_data": request_data, "uid": uid}
-        user: User = AddMemberSerializer().create(data)
-        if user:
+        group: Group = AddMemberSerializer().create(data)
+        if group:
             return {
-                "successMessage": f"Member {user.fname} {user.lname} is added",
-                "errorMessage": None,
+                "message": f"Member {request_data.user_email} is added in group {group.name}",
+                "data": ExportGroup(**group.model_to_dict()).model_dump(),
             }
         else:
             raise MemberNotAddedError()
 
     @staticmethod
     def update_group(uid: str, request_data: UpdateGroupRequestType):
-        filtered_group: Group = Group.objects.filter(id=request_data.group_id)
+        try:
+            if Group.objects.filter(id=request_data.group_id).exists():
+                group: Group = Group.objects.get(id=request_data.group_id)
+                if str(group.creator.id) != uid:
+                    raise NotAnGroupAdminError()
 
-        if not filtered_group.exists():
+                if not request_data.name and not request_data.image:
+                    raise GroupUpdateFailed()
+
+                if (
+                    request_data.name
+                    and isinstance(request_data.name, str)
+                    and len(request_data.name) > 0
+                ):
+                    group.name = request_data.name
+
+                if request_data.image and isinstance(request_data.image, str):
+                    group.image = request_data.image
+
+                group.save()
+                return ExportGroup(**group.model_to_dict()).model_dump()
+        except ObjectDoesNotExist:
             raise GroupNotFoundError()
-
-        group: Group = filtered_group.first()
-
-        if str(group.creator.id) != uid:
-            raise NotAnGroupAdminError()
-
-        if not request_data.name and not request_data.image:
-            raise GroupUpdateFailure()
-
-        if request_data.name and isinstance(request_data.name, str):
-            group.name = request_data.name
-
-        if request_data.image and isinstance(request_data.image, str):
-            group.image = request_data.image
-
-        group.save()

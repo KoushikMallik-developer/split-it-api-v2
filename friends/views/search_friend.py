@@ -25,14 +25,10 @@ class SearchFriendView(APIView):
                 )
                 return Response(
                     data={
-                        "data": (
-                            searched_friends.model_dump()
-                            if searched_friends is not None
-                            else []
-                        ),
+                        "data": (searched_friends if searched_friends else []),
                         "message": (
-                            "Search result fetched"
-                            if searched_friends is not None
+                            "Search results fetched successfully"
+                            if searched_friends
                             else "No result found"
                         ),
                     },

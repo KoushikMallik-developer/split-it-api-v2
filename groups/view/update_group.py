@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from auth_api.services.handlers.exception_handlers import ExceptionHandler
 from auth_api.services.helpers import decode_jwt_token, validate_user_uid
-from groups.export_types.update_group import UpdateGroupRequestType
+from groups.export_types.request_data_type.update_group import UpdateGroupRequestType
 from groups.services.group_services import GroupServices
 
 
@@ -16,12 +16,13 @@ class UpdateGroupView(APIView):
         try:
             user_id = decode_jwt_token(request=request)
             if validate_user_uid(uid=user_id).is_validated:
-                GroupServices().update_group(
+                group = GroupServices().update_group(
                     uid=user_id,
                     request_data=UpdateGroupRequestType(**request.data),
                 )
                 return Response(
                     data={
+                        "data": group,
                         "message": "Group updated successfully.",
                     },
                     status=status.HTTP_200_OK,
