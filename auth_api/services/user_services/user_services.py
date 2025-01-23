@@ -208,7 +208,7 @@ class UserServices:
     def get_user_details(uid: str) -> ExportUser:
         user = User.objects.get(id=uid)
         user_details = ExportUser(
-            with_id=True, with_address=True, **user.model_to_dict()
+            with_id=True, with_friends=True, **user.model_to_dict()
         )
         return user_details
 
@@ -234,7 +234,6 @@ class UserServices:
         if email and validate_user_email(email=email).is_validated:
             if otp and len(otp) == 6:
                 user = User.objects.get(email=email)
-                user = ExportUser(**user.model_to_dict())
                 if not user.is_active:
                     response = OTPServices().verify_otp(user, otp)
                     if response:

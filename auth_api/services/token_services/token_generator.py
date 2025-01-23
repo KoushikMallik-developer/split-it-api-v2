@@ -1,13 +1,11 @@
 from django.core.cache import cache
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from auth_api.export_types.user_types.export_user import ExportUser
-
 
 class TokenGenerator:
     expiration_time = 24 * 60 * 60
 
-    def get_tokens_for_user(self, user: ExportUser) -> dict:
+    def get_tokens_for_user(self, user) -> dict:
         cache_keyword = f"Split-It_User_{user.id}"
         if cache.get(cache_keyword):
             cached_data = cache.get(cache_keyword)
