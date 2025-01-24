@@ -15,13 +15,22 @@ from auth_api.auth_exceptions.user_exceptions import (
     UserNotAuthenticatedError,
     PasswordNotMatchError,
 )
-from friends.friend_exceptions.friend_exceptions import FriendNotFoundError
+from friends.friend_exceptions.friend_exceptions import (
+    FriendNotFoundError,
+    FriendRequestNotSentError,
+    SelfFriendError,
+    AlreadyFriendRequestSentError,
+    AlreadyAFriendError,
+    FriendRequestNotAcceptedError,
+    FriendRequestNotFoundError,
+)
 from groups.group_exceptions.group_exceptions import (
     GroupNotFoundError,
     UserAlreadyInGroupError,
     MemberNotAddedError,
     NotAnGroupAdminError,
-    GroupUpdateFailure,
+    GroupUpdateFailed,
+    GroupNotCreatedError,
 )
 
 
@@ -104,8 +113,36 @@ class ExceptionHandler:
                 "message": "NotAnGroupAdminError",
                 "status": status.HTTP_400_BAD_REQUEST,
             },
-            GroupUpdateFailure: {
+            GroupUpdateFailed: {
                 "message": "GroupUpdateFailure",
+                "status": status.HTTP_400_BAD_REQUEST,
+            },
+            FriendRequestNotSentError: {
+                "message": "FriendRequestNotSentError",
+                "status": status.HTTP_400_BAD_REQUEST,
+            },
+            SelfFriendError: {
+                "message": "SelfFriendError",
+                "status": status.HTTP_400_BAD_REQUEST,
+            },
+            AlreadyFriendRequestSentError: {
+                "message": "AlreadyFriendRequestSentError",
+                "status": status.HTTP_400_BAD_REQUEST,
+            },
+            AlreadyAFriendError: {
+                "message": "AlreadyAFriendError",
+                "status": status.HTTP_400_BAD_REQUEST,
+            },
+            FriendRequestNotAcceptedError: {
+                "message": "FriendRequestNotAcceptedError",
+                "status": status.HTTP_400_BAD_REQUEST,
+            },
+            FriendRequestNotFoundError: {
+                "message": "FriendRequestNotFoundError",
+                "status": status.HTTP_400_BAD_REQUEST,
+            },
+            GroupNotCreatedError: {
+                "message": "GroupNotCreatedError",
                 "status": status.HTTP_400_BAD_REQUEST,
             },
             # Exception: {

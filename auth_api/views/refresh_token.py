@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from auth_api.models.user_models.user import User
 from auth_api.services.handlers.exception_handlers import ExceptionHandler
 
 
@@ -17,7 +18,12 @@ class RefreshTokenView(APIView):
                 raise ValueError("Refresh token is required.")
 
             refresh = RefreshToken(refresh_token)
-            new_access_token = str(refresh.access_token)
+            refresh.verify()
+            user_id = refresh["user_id"]
+            user = User.objects.get(id=user_id)
+
+            new_refresh = RefreshToken.for_user(user)
+            new_access_token = str(new_refresh.access_token)
 
             return Response(
                 data={

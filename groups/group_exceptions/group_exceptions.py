@@ -49,7 +49,7 @@ class NotAnGroupAdminError(AUTHBaseException):
         logging.error(self.msg)
 
 
-class GroupUpdateFailure(AUTHBaseException):
+class GroupUpdateFailed(AUTHBaseException):
     def __init__(self, msg: Optional[str] = None):
         if not msg:
             self.msg = "At least one of 'name' or 'image' must be provided to update the group details."

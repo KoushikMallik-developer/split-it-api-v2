@@ -22,7 +22,7 @@ from auth_api.export_types.request_data_types.update_user_profile import (
 )
 from auth_api.export_types.request_data_types.verify_otp import VerifyOTPRequestType
 from auth_api.export_types.user_types.export_user import ExportUserList, ExportUser
-from auth_api.export_types.user_types.search_user import SearchUserRequestType
+from auth_api.export_types.request_data_types.search_user import SearchUserRequestType
 from auth_api.models.user_models.user import User
 from auth_api.serializers.user_serializer import UserSerializer
 from auth_api.services.definitions import DEFAULT_VERIFICATION_MESSAGE
@@ -77,7 +77,7 @@ class UserServices:
             users = User.objects.filter(query)
         all_user_details = []
         for user in users:
-            export_user = ExportUser(with_id=False, **user.model_to_dict())
+            export_user = ExportUser(with_id=True, **user.model_to_dict())
             all_user_details.append(export_user)
 
         all_user_details = ExportUserList(user_list=all_user_details)
@@ -208,7 +208,7 @@ class UserServices:
     def get_user_details(uid: str) -> ExportUser:
         user = User.objects.get(id=uid)
         user_details = ExportUser(
-            with_id=True, with_address=True, **user.model_to_dict()
+            with_id=True, with_friends=True, **user.model_to_dict()
         )
         return user_details
 
@@ -234,7 +234,6 @@ class UserServices:
         if email and validate_user_email(email=email).is_validated:
             if otp and len(otp) == 6:
                 user = User.objects.get(email=email)
-                user = ExportUser(**user.model_to_dict())
                 if not user.is_active:
                     response = OTPServices().verify_otp(user, otp)
                     if response:

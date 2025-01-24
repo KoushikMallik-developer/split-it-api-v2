@@ -1,5 +1,6 @@
 from typing import Optional
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from rest_framework import serializers
 
@@ -43,16 +44,16 @@ class RemoveFriendRequestSerializer(serializers.ModelSerializer):
         # validated
         return True
 
-    def remove_friend_request(self, data: dict) -> FriendRequest:
+    def remove_friend_request(self, data: dict):
         if self.validate(data=data):
             user_id: str = data.get("primary_user_id")
             friend_request_email: str = data.get("friend_request_email")
+            try:
+                existing_friend_request: FriendRequest = FriendRequest.objects.get(
+                    Q(sender__id=user_id, receiver__email=friend_request_email)
+                    | Q(receiver__id=user_id, sender__email=friend_request_email)
+                )
 
-            existing_friend_request: FriendRequest = FriendRequest.objects.get(
-                Q(sender__id=user_id, receiver__email=friend_request_email)
-                | Q(receiver__id=user_id, sender__email=friend_request_email)
-            )
-
-            existing_friend_request.delete()
-
-            return existing_friend_request
+                existing_friend_request.delete()
+            except ObjectDoesNotExist:
+                raise FriendRequestNotFoundError()

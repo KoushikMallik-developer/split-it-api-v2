@@ -6,8 +6,7 @@ from auth_api.export_types.validation_types.validation_result import ValidationR
 from auth_api.models.user_models.user import User
 from auth_api.services.helpers import validate_user_email
 from friends.friend_exceptions.friend_exceptions import FriendNotFoundError
-from friends.models.friend import Friend
-from groups.export_types.create_group import CreateGroupRequestType
+from groups.export_types.request_data_type.create_group import CreateGroupRequestType
 from groups.models.group import Group
 
 
@@ -19,6 +18,8 @@ class GroupSerializer(serializers.ModelSerializer):
     def validate(self, data: Optional[dict] = None) -> Optional[bool]:
         request: CreateGroupRequestType = data.get("request_data")
         uid: str = data.get("uid")
+
+        user = User.objects.get(id=uid)
 
         members = request.members
         name = request.name
@@ -45,14 +46,7 @@ class GroupSerializer(serializers.ModelSerializer):
                         )
 
                 # check if the member is a friend
-                if (
-                    not Friend.objects.filter(
-                        user2__id=uid, user1__email=member_email
-                    ).exists()
-                    and not Friend.objects.filter(
-                        user2__email=member_email, user1__id=uid
-                    ).exists()
-                ):
+                if not user.friends.filter(email=member_email).exists():
                     raise FriendNotFoundError(
                         msg=f"'{member_email}' is not your friend."
                     )
@@ -78,5 +72,6 @@ class GroupSerializer(serializers.ModelSerializer):
 
             group = Group.objects.create(name=name, image=image, creator=creator)
             group.members.set(list_members)
+            group.save()
 
             return group

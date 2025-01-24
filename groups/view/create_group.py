@@ -5,8 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from auth_api.services.handlers.exception_handlers import ExceptionHandler
 from auth_api.services.helpers import decode_jwt_token, validate_user_uid
-from groups.export_types.create_group import CreateGroupRequestType
-from groups.group_exceptions.group_exceptions import GroupNotCreatedError
+from groups.export_types.request_data_type.create_group import CreateGroupRequestType
 from groups.services.group_services import GroupServices
 
 
@@ -21,16 +20,17 @@ class CreateGroupView(APIView):
                 result = GroupServices.create_new_group_service(
                     request_data=CreateGroupRequestType(**request.data), uid=user_id
                 )
-                if result.get("successMessage"):
-                    return Response(
-                        data={
-                            "successMessage": result.get("successMessage"),
-                            "errorMessage": None,
-                        },
-                        status=status.HTTP_201_CREATED,
-                        content_type="application/json",
-                    )
-                else:
-                    raise GroupNotCreatedError()
+                return Response(
+                    data={
+                        "message": (
+                            result.get("message")
+                            if result.get("message")
+                            else "Group successfully created"
+                        ),
+                        "data": result.get("data"),
+                    },
+                    status=status.HTTP_201_CREATED,
+                    content_type="application/json",
+                )
         except Exception as e:
             return ExceptionHandler().handle_exception(e)

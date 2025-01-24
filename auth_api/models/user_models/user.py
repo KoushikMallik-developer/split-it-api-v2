@@ -1,16 +1,19 @@
+from django.db import models
+
 from auth_api.auth_exceptions.user_exceptions import (
     UserNotVerifiedError,
     UserAuthenticationFailedError,
     UserNotFoundError,
 )
 from auth_api.export_types.request_data_types.sign_in import SignInRequestType
-from auth_api.export_types.user_types.export_user import ExportUser
 from auth_api.models.user_models.abstract_user import AbstractUser
 from auth_api.services.encryption_services.encryption_service import EncryptionServices
 from auth_api.services.token_services.token_generator import TokenGenerator
 
 
 class User(AbstractUser):
+    friends = models.ManyToManyField("self", symmetrical=False, blank=True)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -33,9 +36,7 @@ class User(AbstractUser):
                         == request_data.password
                     ):
                         if user.is_active:
-                            token = TokenGenerator().get_tokens_for_user(
-                                ExportUser(**user.model_to_dict())
-                            )
+                            token = TokenGenerator().get_tokens_for_user(user)
                             return {
                                 "token": token,
                                 "errorMessage": None,

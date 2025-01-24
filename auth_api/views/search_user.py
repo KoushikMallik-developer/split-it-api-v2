@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 
-from auth_api.export_types.user_types.search_user import SearchUserRequestType
+from auth_api.export_types.request_data_types.search_user import SearchUserRequestType
 from auth_api.services.handlers.exception_handlers import ExceptionHandler
 from auth_api.services.helpers import decode_jwt_token, validate_user_uid
 from auth_api.services.user_services.user_services import UserServices
@@ -17,19 +17,19 @@ class SearchUsersView(APIView):
         try:
             user_id = decode_jwt_token(request=request)
             if validate_user_uid(uid=user_id).is_validated:
-                searched_friends = UserServices.get_searched_users(
+                search_results = UserServices.get_searched_users(
                     request_data=SearchUserRequestType(**request.data)
                 )
                 return Response(
                     data={
                         "data": (
-                            searched_friends.model_dump()
-                            if searched_friends is not None
+                            search_results.model_dump()
+                            if search_results is not None
                             else []
                         ),
                         "message": (
-                            "Users are fetched"
-                            if searched_friends is not None
+                            "Search results fetched successfully"
+                            if search_results is not None
                             else "No User found"
                         ),
                     },
