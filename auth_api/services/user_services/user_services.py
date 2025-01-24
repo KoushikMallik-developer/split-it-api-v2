@@ -207,9 +207,7 @@ class UserServices:
     @staticmethod
     def get_user_details(uid: str) -> ExportUser:
         user = User.objects.get(id=uid)
-        user_details = ExportUser(
-            with_id=True, with_friends=True, **user.model_to_dict()
-        )
+        user_details = ExportUser(with_id=True, **user.model_to_dict())
         return user_details
 
     @staticmethod
