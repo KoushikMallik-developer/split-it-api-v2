@@ -2,6 +2,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from groups.export_types.group_types.export_group import ExportGroup
 from groups.export_types.request_data_type.add_member import AddMemberRequestType
 from groups.export_types.request_data_type.create_group import CreateGroupRequestType
+from groups.export_types.request_data_type.delete_group import DeleteGroupRequestType
 from groups.export_types.request_data_type.update_group import UpdateGroupRequestType
 from groups.group_exceptions.group_exceptions import (
     MemberNotAddedError,
@@ -61,5 +62,19 @@ class GroupServices:
 
                 group.save()
                 return ExportGroup(**group.model_to_dict()).model_dump()
+        except ObjectDoesNotExist:
+            raise GroupNotFoundError()
+
+    @staticmethod
+    def remove_group(uid: str, request_data: DeleteGroupRequestType):
+        try:
+            if Group.objects.filter(id=request_data.group_id).exists():
+                group: Group = Group.objects.get(id=request_data.group_id)
+                if str(group.creator.id) != uid:
+                    raise NotAnGroupAdminError()
+
+                group.delete()
+            else:
+                raise GroupNotFoundError()
         except ObjectDoesNotExist:
             raise GroupNotFoundError()

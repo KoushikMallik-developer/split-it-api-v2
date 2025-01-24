@@ -42,7 +42,7 @@ jobs:
 
       # Step 5: Run migrations
       - name: Run migrations
-        run: python manage.py makemigrations && python manage.py migrate
+        run: python manage.py makemigrations auth_api e_app friends groups && python manage.py migrate
 
       # Step 6: Run tests
       - name: Run pytest
