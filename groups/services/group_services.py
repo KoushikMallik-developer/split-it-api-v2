@@ -67,12 +67,14 @@ class GroupServices:
 
     @staticmethod
     def remove_group(uid: str, request_data: DeleteGroupRequestType):
+        try:
+            if Group.objects.filter(id=request_data.group_id).exists():
+                group: Group = Group.objects.get(id=request_data.group_id)
+                if str(group.creator.id) != uid:
+                    raise NotAnGroupAdminError()
 
-        if Group.objects.filter(id=request_data.group_id).exists():
-            group: Group = Group.objects.get(id=request_data.group_id)
-            if str(group.creator.id) != uid:
-                raise NotAnGroupAdminError()
-
-            group.delete()
-        else:
+                group.delete()
+            else:
+                raise GroupNotFoundError()
+        except ObjectDoesNotExist:
             raise GroupNotFoundError()

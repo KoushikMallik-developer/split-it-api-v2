@@ -22,7 +22,6 @@ class RemoveGroupView(APIView):
                 )
                 return Response(
                     data={
-                        "data": None,
                         "message": "Group deleted successfully.",
                     },
                     status=status.HTTP_200_OK,
