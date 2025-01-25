@@ -1,5 +1,7 @@
+from typing import Optional
+
 from django.core.exceptions import ObjectDoesNotExist
-from groups.export_types.group_types.export_group import ExportGroup
+from groups.export_types.group_types.export_group import ExportGroup, ExportGroupList
 from groups.export_types.request_data_type.add_member import AddMemberRequestType
 from groups.export_types.request_data_type.create_group import CreateGroupRequestType
 from groups.export_types.request_data_type.delete_group import DeleteGroupRequestType
@@ -78,3 +80,14 @@ class GroupServices:
                 raise GroupNotFoundError()
         except ObjectDoesNotExist:
             raise GroupNotFoundError()
+
+    @staticmethod
+    def get_all_groups_service(uid: str) -> Optional[list]:
+        groups = Group.objects.filter(members__id=uid)
+        if groups.exists():
+            all_groups = ExportGroupList(
+                group_list=[ExportGroup(**group.model_to_dict()) for group in groups]
+            )
+            return all_groups.model_dump().get("group_list")
+        else:
+            return None
