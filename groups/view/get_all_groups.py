@@ -19,7 +19,7 @@ class GetAllGroupView(APIView):
                 return Response(
                     data={
                         "data": groups if groups is not None else [],
-                        "message": "All friends fetched successfully",
+                        "message": "Groups fetched successfully",
                     },
                     status=status.HTTP_200_OK,
                     content_type="application/json",
