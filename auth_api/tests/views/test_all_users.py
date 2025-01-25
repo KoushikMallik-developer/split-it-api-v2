@@ -26,13 +26,11 @@ class TestAllUsersView:
 
         for user in user_list:
             assert "email" in user
-            assert "username" in user
             assert "fname" in user
             assert "lname" in user
             assert "dob" in user
             assert "phone" in user
             assert user["email"] and isinstance(user["email"], str)
-            assert user["username"] is None or isinstance(user["username"], str)
             assert user["fname"] and isinstance(user["fname"], str)
             assert user["lname"] and isinstance(user["lname"], str)
             assert user["dob"] is None or isinstance(user["dob"], str)

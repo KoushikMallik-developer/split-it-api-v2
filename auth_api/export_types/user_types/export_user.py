@@ -9,7 +9,6 @@ from pydantic import BaseModel
 
 class ExportUser(BaseModel):
     id: Optional[UUID]
-    username: str
     email: str
     fname: str
     lname: str
