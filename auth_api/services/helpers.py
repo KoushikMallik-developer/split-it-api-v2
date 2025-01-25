@@ -155,7 +155,7 @@ def string_to_datetime(date_str: str) -> datetime:
 
 
 def validate_dob(dob: datetime) -> ValidationResult:
-    if calculate_age(dob) > 13:
+    if calculate_age(dob) >= 13:
         return ValidationResult(is_validated=True, error=None)
     return ValidationResult(
         is_validated=False, error="Your age cannot be less than 13 years."

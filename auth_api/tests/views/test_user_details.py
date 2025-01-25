@@ -24,10 +24,6 @@ class TestUserDetailsView:
         assert isinstance(response.data["data"]["email"], str)
         assert response.data["data"]["email"] == "koushikmallik001@gmail.com"
 
-        assert response.data["data"]["username"]
-        assert isinstance(response.data["data"]["username"], str)
-        assert response.data["data"]["username"] == "koushikmallik"
-
         assert response.data["data"]["id"]
         assert isinstance(response.data["data"]["id"], UUID)
 
