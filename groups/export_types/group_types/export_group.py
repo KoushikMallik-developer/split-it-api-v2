@@ -1,3 +1,4 @@
+import typing
 from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
@@ -27,3 +28,7 @@ class ExportGroup(BaseModel):
             ]
 
         super().__init__(**kwargs)
+
+
+class ExportGroupList(BaseModel):
+    group_list: typing.List[ExportGroup]
