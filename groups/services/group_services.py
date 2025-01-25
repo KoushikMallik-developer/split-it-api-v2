@@ -38,7 +38,7 @@ class GroupServices:
         group: Group = AddMemberSerializer().create(data)
         if group:
             return {
-                "message": f"Member {request_data.user_email} is added in group {group.name}",
+                "message": f"Member {request_data.user_id} is added in group {group.name}",
                 "data": ExportGroup(**group.model_to_dict()).model_dump(),
             }
         else:

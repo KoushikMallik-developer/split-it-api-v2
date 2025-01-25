@@ -13,6 +13,7 @@ from auth_api.services.token_services.token_generator import TokenGenerator
 
 class User(AbstractUser):
     friends = models.ManyToManyField("self", symmetrical=False, blank=True)
+    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

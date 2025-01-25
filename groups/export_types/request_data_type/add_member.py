@@ -2,5 +2,5 @@ from pydantic import BaseModel
 
 
 class AddMemberRequestType(BaseModel):
-    user_email: str
+    user_id: str
     group_id: str

@@ -12,7 +12,7 @@ class Balance(GenericBaseModel):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="balances_user"
     )
-    amount = models.FloatField(default=0)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     def __str__(self):
         return f"{self.user.username}: {self.amount} in {self.group.name}"
