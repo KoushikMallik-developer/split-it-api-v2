@@ -3,10 +3,13 @@ from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
 
+from django.core.exceptions import ObjectDoesNotExist
 from pydantic import BaseModel
 
 from auth_api.export_types.user_types.export_user import ExportUser
 from auth_api.models.user_models.user import User
+from groups.group_exceptions.group_exceptions import GroupNotFoundError
+from groups.models.group import Group
 
 
 class ExportGroup(BaseModel):
@@ -19,15 +22,17 @@ class ExportGroup(BaseModel):
     updated_at: datetime
 
     def __init__(self, **kwargs):
-        if "creator" in kwargs and isinstance(kwargs["creator"], User):
-            kwargs["creator"] = ExportUser(**kwargs["creator"].model_to_dict())
-
-        if "members" in kwargs and kwargs["members"]:
+        try:
+            if "creator" in kwargs and isinstance(kwargs["creator"], User):
+                kwargs["creator"] = ExportUser(**kwargs["creator"].model_to_dict())
+            members = Group.objects.get(id=kwargs["id"]).members.all()
             kwargs["members"] = [
-                ExportUser(**member.model_to_dict()) for member in kwargs["members"]
+                ExportUser(**member.model_to_dict()) for member in members
             ]
 
-        super().__init__(**kwargs)
+            super().__init__(**kwargs)
+        except ObjectDoesNotExist:
+            raise GroupNotFoundError()
 
 
 class ExportGroupList(BaseModel):
