@@ -10,7 +10,7 @@ class Expense(GenericBaseModel):
     name = models.CharField(max_length=100, null=True, blank=True)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="expenses")
     category = models.ForeignKey(ExpenseCategory, on_delete=models.CASCADE)
-    amount = models.FloatField()
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
     paid_by = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="paid_expenses"
     )

@@ -9,7 +9,7 @@ from auth_api.services.helpers import decode_jwt_token, validate_user_uid
 from e_app.export_types.request_data_types.add_expense_request_type import (
     AddExpenseRequestType,
 )
-from e_app.services.ExpenseService import ExpenseService
+from e_app.services.expense_services import ExpenseService
 
 
 class AddExpense(APIView):

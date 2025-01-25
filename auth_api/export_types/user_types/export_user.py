@@ -4,6 +4,7 @@ import typing
 from typing import Optional
 from uuid import UUID
 
+from _decimal import Decimal
 from pydantic import BaseModel
 
 
@@ -15,6 +16,7 @@ class ExportUser(BaseModel):
     dob: Optional[datetime.datetime]
     phone: Optional[str]
     image: Optional[str]
+    balance: Optional[Decimal]
     is_active: bool
     created_at: datetime.datetime
     updated_at: datetime.datetime
