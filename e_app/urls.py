@@ -1,7 +1,7 @@
 from django.urls import path
-from .views import TestView
 
+from e_app.views.add_expense import AddExpense
 
 urlpatterns = [
-    path("endpoint/", TestView.as_view(), name="test_endpoint"),
+    path("add-expense/", AddExpense.as_view(), name="add-expense"),
 ]

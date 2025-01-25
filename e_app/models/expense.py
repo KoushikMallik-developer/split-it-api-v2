@@ -7,6 +7,7 @@ from groups.models.group import Group
 
 
 class Expense(GenericBaseModel):
+    name = models.CharField(max_length=100, null=True, blank=True)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="expenses")
     category = models.ForeignKey(ExpenseCategory, on_delete=models.CASCADE)
     amount = models.FloatField()
