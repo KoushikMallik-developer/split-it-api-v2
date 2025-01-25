@@ -11,3 +11,12 @@ class ExpenseNotFoundError(AUTHBaseException):
         else:
             super().__init__(msg)
         logging.error(self.msg)
+
+
+class NotAParticipantError(AUTHBaseException):
+    def __init__(self, msg: Optional[str] = None):
+        if not msg:
+            self.msg = "You are not a participant of this expense."
+        else:
+            super().__init__(msg)
+        logging.error(self.msg)

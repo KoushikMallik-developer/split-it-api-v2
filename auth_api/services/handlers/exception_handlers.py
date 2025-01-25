@@ -15,6 +15,10 @@ from auth_api.auth_exceptions.user_exceptions import (
     UserNotAuthenticatedError,
     PasswordNotMatchError,
 )
+from e_app.expense_exceptions.expense_exceptions import (
+    ExpenseNotFoundError,
+    NotAParticipantError,
+)
 from friends.friend_exceptions.friend_exceptions import (
     FriendNotFoundError,
     FriendRequestNotSentError,
@@ -143,6 +147,14 @@ class ExceptionHandler:
             },
             GroupNotCreatedError: {
                 "message": "GroupNotCreatedError",
+                "status": status.HTTP_400_BAD_REQUEST,
+            },
+            ExpenseNotFoundError: {
+                "message": "ExpenseNotFoundError",
+                "status": status.HTTP_400_BAD_REQUEST,
+            },
+            NotAParticipantError: {
+                "message": "NotAParticipantError",
                 "status": status.HTTP_400_BAD_REQUEST,
             },
             # Exception: {

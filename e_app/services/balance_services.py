@@ -34,3 +34,22 @@ class BalanceServices:
             participant.balance -= expense.amount / len(expense.participants.all())
             participant.save()
             balance.save()
+
+    def update_user_group_balance_on_delete(self, expense: Expense):
+        balance = Balance.objects.get(
+            user__id=expense.paid_by.id, group__id=expense.group.id
+        )  # handling user group balance for paid by
+        balance.amount -= expense.amount
+        expense.paid_by.balance -= expense.amount  # User Personal ultimate balance
+        expense.paid_by.save()
+        balance.save()
+
+        # handling user group balance for participants
+        for participant in expense.participants.all():
+            balance = Balance.objects.get(
+                user__id=participant.id, group__id=expense.group.id
+            )
+            balance.amount += expense.amount / len(expense.participants.all())
+            participant.balance += expense.amount / len(expense.participants.all())
+            participant.save()
+            balance.save()

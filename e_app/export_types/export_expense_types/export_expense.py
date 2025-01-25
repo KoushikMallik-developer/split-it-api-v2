@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import List
+from uuid import UUID
 
 from _decimal import Decimal
 from django.core.exceptions import ObjectDoesNotExist
@@ -15,6 +16,7 @@ from groups.models.group import Group
 
 
 class ExportExpense(BaseModel):
+    id: UUID
     name: str
     amount: Decimal
     paid_by: ExportUser
