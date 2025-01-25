@@ -1,10 +1,13 @@
 from typing import Optional
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
+
 from groups.export_types.group_types.export_group import ExportGroup, ExportGroupList
 from groups.export_types.request_data_type.add_member import AddMemberRequestType
 from groups.export_types.request_data_type.create_group import CreateGroupRequestType
 from groups.export_types.request_data_type.delete_group import DeleteGroupRequestType
+from groups.export_types.request_data_type.search_group import SearchGroupRequestType
 from groups.export_types.request_data_type.update_group import UpdateGroupRequestType
 from groups.group_exceptions.group_exceptions import (
     MemberNotAddedError,
@@ -91,3 +94,28 @@ class GroupServices:
             return all_groups.model_dump().get("group_list")
         else:
             return None
+
+    @staticmethod
+    def get_searched_groups(
+        request_data: SearchGroupRequestType, user_id: str
+    ) -> Optional[list]:
+        try:
+            keywords = request_data.keyword.split(" ")
+            query = Q()
+            for keyword in keywords:
+                query |= Q(name__icontains=keyword) | Q(description__icontains=keyword)
+
+            groups = Group.objects.filter(members__id=user_id).filter(query)
+
+            if groups.exists():
+                all_groups = [ExportGroup(**group.model_to_dict()) for group in groups]
+                return (
+                    ExportGroupList(group_list=all_groups, user_id=user_id)
+                    .model_dump()
+                    .get("group_list")
+                )
+            else:
+                return None
+
+        except ObjectDoesNotExist:
+            raise GroupNotFoundError()
