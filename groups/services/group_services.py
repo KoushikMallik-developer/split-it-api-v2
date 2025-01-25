@@ -108,9 +108,7 @@ class GroupServices:
             groups = Group.objects.filter(members__id=user_id).filter(query)
 
             if groups.exists():
-                all_groups = [
-                    ExportGroup(**group.model_to_dict()) for group in groups
-                ]
+                all_groups = [ExportGroup(**group.model_to_dict()) for group in groups]
                 return (
                     ExportGroupList(group_list=all_groups, user_id=user_id)
                     .model_dump()
