@@ -1,6 +1,7 @@
 import os
 from typing import Optional
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from dotenv import load_dotenv
 from psycopg2 import DatabaseError
@@ -39,6 +40,7 @@ from auth_api.services.helpers import (
 )
 from auth_api.services.otp_services.otp_services import OTPServices
 from auth_api.services.token_services.token_generator import TokenGenerator
+from friends.friend_exceptions.friend_exceptions import FriendNotFoundError
 
 
 class UserServices:
@@ -59,29 +61,27 @@ class UserServices:
             return None
 
     @staticmethod
-    def get_searched_users(
-        request_data: SearchUserRequestType,
-    ) -> Optional[ExportUserList]:
-        users = []
-        if validate_email_format(request_data.keyword):
-            users = User.objects.filter(email=request_data.keyword)
-        else:
-            keywords = request_data.keyword.split(" ")
+    def get_searched_users(request_data: SearchUserRequestType) -> Optional[list]:
+        try:
+            users = None
+            if validate_email_format(request_data.keyword):
+                users = User.objects.filter(email=request_data.keyword)[:10]
+            else:
+                keywords = request_data.keyword.split(" ")
+                query = Q()
+                for keyword in keywords:
+                    query |= Q(fname__icontains=keyword) | Q(lname__icontains=keyword)
 
-            search_keywords = [request_data.keyword] + keywords
+                users = User.objects.filter(query)[:10]
 
-            query = Q()
-            for keyword in search_keywords:
-                query |= Q(fname__icontains=keyword) | Q(lname__icontains=keyword)
+            if users and users.exists():
+                all_users = [ExportUser(**user.model_to_dict()) for user in users]
+                return ExportUserList(user_list=all_users).model_dump().get("user_list")
+            else:
+                return None
 
-            users = User.objects.filter(query)
-        all_user_details = []
-        for user in users:
-            export_user = ExportUser(with_id=True, **user.model_to_dict())
-            all_user_details.append(export_user)
-
-        all_user_details = ExportUserList(user_list=all_user_details)
-        return all_user_details
+        except ObjectDoesNotExist:
+            raise FriendNotFoundError()
 
     @staticmethod
     def create_new_user_service(request_data: CreateUserRequestType) -> dict:
