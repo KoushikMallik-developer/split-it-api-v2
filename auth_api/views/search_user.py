@@ -17,20 +17,16 @@ class SearchUsersView(APIView):
         try:
             user_id = decode_jwt_token(request=request)
             if validate_user_uid(uid=user_id).is_validated:
-                search_results = UserServices.get_searched_users(
+                search_users = UserServices.get_searched_users(
                     request_data=SearchUserRequestType(**request.data)
                 )
                 return Response(
                     data={
-                        "data": (
-                            search_results.model_dump()
-                            if search_results is not None
-                            else []
-                        ),
+                        "data": (search_users if search_users else []),
                         "message": (
                             "Search results fetched successfully"
-                            if search_results is not None
-                            else "No User found"
+                            if search_users
+                            else "No result found"
                         ),
                     },
                     status=status.HTTP_200_OK,
