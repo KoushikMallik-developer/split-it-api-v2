@@ -145,12 +145,12 @@ class UseFriendServices:
     ) -> dict:
         data: dict = {
             "sender": uid,
-            "receiver": request_data.user_email,
+            "receiver": request_data.user_id,
         }
         friend_request = FriendRequestSerializer().create(data=data)
         if friend_request:
             return {
-                "message": f"Friend request sent to {request_data.user_email}",
+                "message": "Friend request sent to user",
             }
         else:
             raise FriendRequestNotSentError()
