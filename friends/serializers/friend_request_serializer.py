@@ -1,13 +1,13 @@
 from typing import Optional
+
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 
 from auth_api.auth_exceptions.user_exceptions import (
     UserNotFoundError,
     UserNotAuthenticatedError,
 )
-from auth_api.export_types.validation_types.validation_result import ValidationResult
 from auth_api.models.user_models.user import User
-from auth_api.services.helpers import validate_user_email
 from friends.friend_exceptions.friend_exceptions import (
     SelfFriendError,
     AlreadyFriendRequestSentError,
@@ -28,15 +28,12 @@ class FriendRequestSerializer(serializers.ModelSerializer):
 
         # Email Validation
         if data.get("receiver") and isinstance(data.get("receiver"), str):
-            validation_result_email: ValidationResult = validate_user_email(
-                data.get("receiver")
-            )
-            if not validation_result_email.is_validated:
+            try:
+                receiver = User.objects.get(id=data.get("receiver"))
+            except ObjectDoesNotExist:
                 raise UserNotFoundError(msg="This user is not registered with us.")
         else:
             raise ValueError("user_email is required.")
-
-        receiver: User = User.objects.get(email=data.get("receiver"))
 
         # Check if the user has already sent friend request to the same user.
         already_sent_request: bool = (
@@ -68,7 +65,7 @@ class FriendRequestSerializer(serializers.ModelSerializer):
     def create(self, data: dict) -> FriendRequest:
         if self.validate(data=data):
             sender: User = User.objects.get(id=data.get("sender"))
-            receiver: User = User.objects.get(email=data.get("receiver"))
+            receiver: User = User.objects.get(id=data.get("receiver"))
             new_friend_request = FriendRequest(sender=sender, receiver=receiver)
             new_friend_request.save()
             return new_friend_request
