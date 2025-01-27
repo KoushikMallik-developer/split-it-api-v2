@@ -9,7 +9,7 @@ from auth_api.auth_exceptions.user_exceptions import (
 )
 from auth_api.export_types.validation_types.validation_result import ValidationResult
 from auth_api.models.user_models.user import User
-from auth_api.services.helpers import validate_user_email
+from auth_api.services.helpers import validate_user_email, is_valid_uuid, validate_user_uid
 from friends.friend_exceptions.friend_exceptions import (
     AlreadyAFriendError,
     FriendRequestNotFoundError,
@@ -26,15 +26,15 @@ class AcceptFriendRequestSerializer(serializers.ModelSerializer):
 
         # Email Validation
         if data.get("sender") and isinstance(data.get("sender"), str):
-            validation_result_email: ValidationResult = validate_user_email(
-                data.get("sender")
-            )
-            if not validation_result_email.is_validated:
+            if not is_valid_uuid(value=data.get("sender")):
+                raise ValueError("User ID is not valid.")
+
+            if not validate_user_uid(uid=data.get("sender")).is_validated:
                 raise UserNotFoundError(msg="This user is not registered with us.")
         else:
-            raise ValueError("user_email is required.")
+            raise ValueError("User ID is required.")
 
-        sender: User = User.objects.get(email=data.get("sender"))
+        sender: User = User.objects.get(id=data.get("sender"))
 
         receiver: User = User.objects.get(id=data.get("receiver"))
         if not receiver:
@@ -54,7 +54,7 @@ class AcceptFriendRequestSerializer(serializers.ModelSerializer):
     def create(self, data: dict):
         if self.validate(data=data):
             try:
-                sender: User = User.objects.get(email=data.get("sender"))
+                sender: User = User.objects.get(id=data.get("sender"))
                 receiver: User = User.objects.get(id=data.get("receiver"))
 
                 existing_friend_request: FriendRequest = FriendRequest.objects.get(

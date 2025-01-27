@@ -160,8 +160,8 @@ class UseFriendServices:
         request_data: AcceptFriendRequestType, uid: str
     ) -> dict:
         data: dict = {
-            "receiver": uid,
-            "sender": request_data.user_email,
+            "receiver": request_data.user_id,
+            "sender": uid,
         }
         AcceptFriendRequestSerializer().create(data=data)
         return {
@@ -182,9 +182,9 @@ class UseFriendServices:
     ) -> dict:
         data: dict = {
             "primary_user_id": uid,
-            "friend_request_email": request_data.user_email,
+            "friend_request_id": request_data.user_id,
         }
         RemoveFriendRequestSerializer().remove_friend_request(data=data)
         return {
-            "message": "Friend request deleted.",
+            "message": "Friend request deleted successfully.",
         }

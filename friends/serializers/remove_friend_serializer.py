@@ -12,21 +12,20 @@ from friends.friend_exceptions.friend_exceptions import FriendNotFoundError
 class RemoveFriendSerializer(serializers.ModelSerializer):
     def validate(self, data: Optional[dict] = None) -> Optional[bool]:
         # User uuid Validation
-        if data.get("user_id") and isinstance(data.get("user_id"), str):
-
-            if not is_valid_uuid(value=data.get("user_id")):
-                raise ValueError("User ID is not valid.")
-
-            if not validate_user_uid(uid=data.get("user_id")).is_validated:
-                raise UserNotFoundError(msg="This user is not registered with us.")
-        else:
+        if not data.get("user_id") or not isinstance(data.get("user_id"), str):
             raise ValueError("User ID is required.")
 
+        if not is_valid_uuid(value=data.get("user_id")):
+            raise ValueError("User ID is not valid.")
+
         # Check if the friend exists with the provided email
-        user: User = User.objects.get(id=data.get("primary_user_id"))
-        friend_exists = user.friends.filter(id=data.get("user_id")).exists()
-        if not friend_exists:
-            raise FriendNotFoundError()
+        try:
+            user: User = User.objects.get(id=data.get("primary_user_id"))
+            friend_exists = user.friends.filter(id=data.get("user_id")).exists()
+            if not friend_exists:
+                raise FriendNotFoundError()
+        except ObjectDoesNotExist:
+            raise UserNotFoundError(msg="This user is not registered with us.")
 
         # validated
         return True

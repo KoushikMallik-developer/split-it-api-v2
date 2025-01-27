@@ -29,7 +29,7 @@ class RemoveFriendRequest(APIView):
                         "message": (
                             result.get("message")
                             if result.get("message")
-                            else "Friend request deleted"
+                            else "Friend request deleted successfully."
                         ),
                     },
                     status=status.HTTP_200_OK,
