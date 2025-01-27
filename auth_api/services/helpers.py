@@ -2,6 +2,7 @@ import os
 import re
 from datetime import datetime
 
+import uuid
 from dotenv import load_dotenv
 from rest_framework_simplejwt.tokens import AccessToken
 
@@ -61,6 +62,14 @@ def validate_user_uid(uid: str) -> ValidationResult:
             error=None,
         )
     return ValidationResult(is_validated=False, error="User does not exists.")
+
+
+def is_valid_uuid(value: str) -> bool:
+    try:
+        uuid_obj = uuid.UUID(value, version=4)
+        return str(uuid_obj) == value
+    except ValueError:
+        return False
 
 
 def validate_email_format(email: str) -> bool:

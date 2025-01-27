@@ -170,7 +170,7 @@ class UseFriendServices:
 
     @staticmethod
     def remove_friend_service(request_data: RemoveFriendType, uid: str) -> dict:
-        data: dict = {"user_email": request_data.user_email, "primary_user_id": uid}
+        data: dict = {"user_id": request_data.user_id, "primary_user_id": uid}
         RemoveFriendSerializer().remove_friend(data=data)
         return {
             "message": "Friend successfully removed.",
