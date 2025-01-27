@@ -1,4 +1,6 @@
 import logging
+
+import django
 from psycopg2 import DatabaseError
 from pydantic import ValidationError
 from rest_framework import status, serializers
@@ -95,6 +97,10 @@ class ExceptionHandler:
             },
             serializers.ValidationError: {
                 "message": "SerializerValidationError",
+                "status": status.HTTP_400_BAD_REQUEST,
+            },
+            django.core.exceptions.ValidationError: {
+                "message": "ValidationError",
                 "status": status.HTTP_400_BAD_REQUEST,
             },
             FriendNotFoundError: {

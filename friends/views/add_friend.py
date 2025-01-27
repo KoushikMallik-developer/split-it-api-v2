@@ -25,7 +25,7 @@ class AddFriend(APIView):
                         "message": (
                             result.get("message")
                             if result.get("message")
-                            else "Friend request sent"
+                            else "Friend Request Sent Successfully"
                         ),
                     },
                     status=status.HTTP_201_CREATED,

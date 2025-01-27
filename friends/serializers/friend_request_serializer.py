@@ -8,6 +8,7 @@ from auth_api.auth_exceptions.user_exceptions import (
     UserNotAuthenticatedError,
 )
 from auth_api.models.user_models.user import User
+from auth_api.services.helpers import is_valid_uuid
 from friends.friend_exceptions.friend_exceptions import (
     SelfFriendError,
     AlreadyFriendRequestSentError,
@@ -26,6 +27,9 @@ class FriendRequestSerializer(serializers.ModelSerializer):
         if not sender:
             raise UserNotAuthenticatedError()
 
+        if not is_valid_uuid(value=data.get("receiver")):
+            raise ValueError("User ID is not valid.")
+
         # Email Validation
         if data.get("receiver") and isinstance(data.get("receiver"), str):
             try:
@@ -33,7 +37,7 @@ class FriendRequestSerializer(serializers.ModelSerializer):
             except ObjectDoesNotExist:
                 raise UserNotFoundError(msg="This user is not registered with us.")
         else:
-            raise ValueError("user_email is required.")
+            raise ValueError("User ID is required.")
 
         # Check if the user has already sent friend request to the same user.
         already_sent_request: bool = (
