@@ -7,9 +7,11 @@ from auth_api.auth_exceptions.user_exceptions import (
     UserNotFoundError,
     UserNotAuthenticatedError,
 )
-from auth_api.export_types.validation_types.validation_result import ValidationResult
 from auth_api.models.user_models.user import User
-from auth_api.services.helpers import validate_user_email, is_valid_uuid, validate_user_uid
+from auth_api.services.helpers import (
+    is_valid_uuid,
+    validate_user_uid,
+)
 from friends.friend_exceptions.friend_exceptions import (
     AlreadyAFriendError,
     FriendRequestNotFoundError,

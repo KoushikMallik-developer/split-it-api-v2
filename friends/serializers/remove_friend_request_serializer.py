@@ -3,12 +3,7 @@ from typing import Optional
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from rest_framework import serializers
-
-from auth_api.auth_exceptions.user_exceptions import (
-    UserNotFoundError,
-)
-from auth_api.export_types.validation_types.validation_result import ValidationResult
-from auth_api.services.helpers import validate_user_email, is_valid_uuid
+from auth_api.services.helpers import is_valid_uuid
 from friends.friend_exceptions.friend_exceptions import FriendRequestNotFoundError
 from friends.models.friend_request import FriendRequest
 
@@ -30,8 +25,7 @@ class RemoveFriendRequestSerializer(serializers.ModelSerializer):
 
         # checking the provided email is part of the friend request list
         existing_friend_request = FriendRequest.objects.filter(
-            Q(sender__id=friend_request_id)
-            | Q(receiver__id=friend_request_id)
+            Q(sender__id=friend_request_id) | Q(receiver__id=friend_request_id)
         ).exists()
 
         if not existing_friend_request:

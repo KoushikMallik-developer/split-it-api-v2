@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from auth_api.auth_exceptions.user_exceptions import UserNotFoundError
 from auth_api.models.user_models.user import User
-from auth_api.services.helpers import validate_user_uid, is_valid_uuid
+from auth_api.services.helpers import is_valid_uuid
 from friends.friend_exceptions.friend_exceptions import FriendNotFoundError
 
 
