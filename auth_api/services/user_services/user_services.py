@@ -62,7 +62,9 @@ class UserServices:
             return None
 
     @staticmethod
-    def get_searched_users(request_data: SearchUserRequestType, uid: str) -> Optional[list]:
+    def get_searched_users(
+        request_data: SearchUserRequestType, uid: str
+    ) -> Optional[list]:
         try:
             users = None
             keyword = request_data.keyword.strip()
