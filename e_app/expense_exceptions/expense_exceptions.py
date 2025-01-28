@@ -20,3 +20,12 @@ class NotAParticipantError(AUTHBaseException):
         else:
             super().__init__(msg)
         logging.error(self.msg)
+
+
+class SettlementNotFoundError(AUTHBaseException):
+    def __init__(self, msg: Optional[str] = None):
+        if not msg:
+            self.msg = "Settlement not found."
+        else:
+            super().__init__(msg)
+        logging.error(self.msg)

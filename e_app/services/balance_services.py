@@ -4,7 +4,8 @@ from e_app.models.expense import Expense
 
 class BalanceServices:
 
-    def update_user_group_balance(self, expense: Expense):
+    @staticmethod
+    def update_user_group_balance(expense: Expense):
         # handling user group balance for paid by
         if not Balance.objects.filter(
             user__id=expense.paid_by.id, group__id=expense.group.id
@@ -35,7 +36,8 @@ class BalanceServices:
             participant.save()
             balance.save()
 
-    def update_user_group_balance_on_delete(self, expense: Expense):
+    @staticmethod
+    def update_user_group_balance_on_delete(expense: Expense):
         balance = Balance.objects.get(
             user__id=expense.paid_by.id, group__id=expense.group.id
         )  # handling user group balance for paid by
@@ -53,3 +55,39 @@ class BalanceServices:
             participant.balance += expense.amount / len(expense.participants.all())
             participant.save()
             balance.save()
+
+    @staticmethod
+    def update_user_group_balance_on_settlement(settlement):
+        balance = Balance.objects.get(
+            user__id=settlement.settled_by.id, group__id=settlement.group.id
+        )
+        balance.amount += settlement.amount
+        settlement.settled_by.balance += settlement.amount
+        settlement.settled_by.save()
+        balance.save()
+
+        balance = Balance.objects.get(
+            user__id=settlement.paid_to.id, group__id=settlement.group.id
+        )
+        balance.amount -= settlement.amount
+        settlement.paid_to.balance -= settlement.amount
+        settlement.paid_to.save()
+        balance.save()
+
+    @staticmethod
+    def update_user_group_balance_on_settlement_delete(settlement):
+        balance = Balance.objects.get(
+            user__id=settlement.settled_by.id, group__id=settlement.group.id
+        )
+        balance.amount -= settlement.amount
+        settlement.settled_by.balance -= settlement.amount
+        settlement.settled_by.save()
+        balance.save()
+
+        balance = Balance.objects.get(
+            user__id=settlement.paid_to.id, group__id=settlement.group.id
+        )
+        balance.amount += settlement.amount
+        settlement.paid_to.balance += settlement.amount
+        settlement.paid_to.save()
+        balance.save()
