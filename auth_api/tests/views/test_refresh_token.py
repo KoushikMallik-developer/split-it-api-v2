@@ -13,23 +13,35 @@ class TestRefreshTokenView:
     def test_refresh_token_success(self, api_client: APIClient):
         user = User.objects.first()
         refresh = RefreshToken.for_user(user)
-        data = {"refresh": str(refresh)}
-        response = api_client.post(self.url, data, format="json")
+        headers = {
+            "Authorization": "Bearer " + str(refresh),
+            "Content-Type": "application/json",
+        }
+        response = api_client.post(self.url, headers=headers, format="json")
 
         assert response.status_code == status.HTTP_200_OK
         assert "access" in response.data
         assert response.data["message"] == "Refreshed access token successfully."
 
     def test_refresh_token_missing_token(self, api_client: APIClient):
-        data = {}
-        response = api_client.post(self.url, data, format="json")
+        headers = {
+            "Authorization": "Bearer ",
+            "Content-Type": "application/json",
+        }
+        response = api_client.post(self.url, headers=headers, format="json")
 
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-        assert response.data["message"] == "ValueError: Refresh token is required."
+        assert (
+            response.data["message"]
+            == "The user is not authenticated, please re-login."
+        )
 
     def test_refresh_token_invalid_token(self, api_client: APIClient):
-        data = {"refresh": "invalidtoken"}
-        response = api_client.post(self.url, data, format="json")
+        headers = {
+            "Authorization": "Bearer " + "invalidToken",
+            "Content-Type": "application/json",
+        }
+        response = api_client.post(self.url, headers=headers, format="json")
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert response.data["message"] == "TokenError: Token is invalid or expired"
