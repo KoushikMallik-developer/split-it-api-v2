@@ -30,7 +30,7 @@ class TestRefreshTokenView:
         }
         response = api_client.post(self.url, headers=headers, format="json")
 
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert (
             response.data["message"]
             == "The user is not authenticated, please re-login."
