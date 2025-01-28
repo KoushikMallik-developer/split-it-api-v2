@@ -33,7 +33,7 @@ class TestRefreshTokenView:
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert (
             response.data["message"]
-            == "The user is not authenticated, please re-login."
+            == "UserNotAuthenticatedError: The user is not authenticated, please re-login."
         )
 
     def test_refresh_token_invalid_token(self, api_client: APIClient):
