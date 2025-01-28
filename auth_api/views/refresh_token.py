@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from auth_api.auth_exceptions.user_exceptions import UserNotAuthenticatedError
 from auth_api.models.user_models.user import User
 from auth_api.services.handlers.exception_handlers import ExceptionHandler
 
@@ -13,11 +14,18 @@ class RefreshTokenView(APIView):
 
     def post(self, request):
         try:
-            refresh_token = request.data.get("refresh")
-            if not refresh_token:
-                raise ValueError("Refresh token is required.")
+            if (
+                "Authorization" not in request.headers
+                or not request.headers.get("Authorization")
+                or not isinstance(request.headers.get("Authorization"), str)
+            ):
+                raise UserNotAuthenticatedError()
+            token = request.headers.get("Authorization", "").split(" ")[1]
 
-            refresh = RefreshToken(refresh_token)
+            if not token:
+                raise UserNotAuthenticatedError()
+
+            refresh = RefreshToken(token)
             refresh.verify()
             user_id = refresh["user_id"]
             user = User.objects.get(id=user_id)
