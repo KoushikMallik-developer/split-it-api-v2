@@ -41,6 +41,7 @@ from auth_api.services.helpers import (
 from auth_api.services.otp_services.otp_services import OTPServices
 from auth_api.services.token_services.token_generator import TokenGenerator
 from friends.friend_exceptions.friend_exceptions import FriendNotFoundError
+from friends.models.friend_request import FriendRequest
 
 
 class UserServices:
@@ -66,10 +67,11 @@ class UserServices:
     ) -> Optional[list]:
         try:
             users = None
-            if validate_email_format(request_data.keyword):
-                users = User.objects.filter(email=request_data.keyword)[:10]
+            keyword = request_data.keyword.strip()
+            if validate_email_format(keyword):
+                users = User.objects.filter(email=keyword)[:10]
             else:
-                keywords = request_data.keyword.split(" ")
+                keywords = keyword.split(" ")
                 query = Q()
                 for keyword in keywords:
                     query |= Q(fname__icontains=keyword) | Q(lname__icontains=keyword)
@@ -77,10 +79,23 @@ class UserServices:
                 users = User.objects.filter(query)[:10]
 
             if users and users.exists():
-                all_users = []
-                for user in users:
-                    if str(user.id) != uid:
-                        all_users.append(ExportUser(**user.model_to_dict()))
+              all_users = []
+              for user in users:
+                  if str(user.id) != uid:
+                    is_friend = user.friends.filter(id=uid).exists()
+                    is_requested = FriendRequest.objects.filter(
+                        sender=uid, receiver=user.id
+                    ).exists()
+                    is_request_received = FriendRequest.objects.filter(
+                        sender=user.id, receiver=uid
+                    ).exists()
+                    user = ExportUser(**user.model_to_dict())
+                    user.is_friend = is_friend
+                    user.is_requested = is_requested
+                    user.is_request_received = is_request_received
+                    all_users.append(user)
+
+              if all_users and len(all_users) > 0:
                 return ExportUserList(user_list=all_users).model_dump().get("user_list")
             else:
                 return None
