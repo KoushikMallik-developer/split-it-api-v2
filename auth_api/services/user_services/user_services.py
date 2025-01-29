@@ -78,24 +78,29 @@ class UserServices:
 
                 users = User.objects.filter(query)[:10]
 
-            all_users = []
-            for user in users:
+            if users and users.exists():
+                all_users = []
+                for user in users:
+                    if str(user.id) != uid:
+                        is_friend = user.friends.filter(id=uid).exists()
+                        is_requested = FriendRequest.objects.filter(
+                            sender=uid, receiver=user.id
+                        ).exists()
+                        is_request_received = FriendRequest.objects.filter(
+                            sender=user.id, receiver=uid
+                        ).exists()
+                        user = ExportUser(**user.model_to_dict())
+                        user.is_friend = is_friend
+                        user.is_requested = is_requested
+                        user.is_request_received = is_request_received
+                        all_users.append(user)
 
-                is_friend = user.friends.filter(id=uid).exists()
-                is_requested = FriendRequest.objects.filter(
-                    sender=uid, receiver=user.id
-                ).exists()
-                is_request_received = FriendRequest.objects.filter(
-                    sender=user.id, receiver=uid
-                ).exists()
-                user = ExportUser(**user.model_to_dict())
-                user.is_friend = is_friend
-                user.is_requested = is_requested
-                user.is_request_received = is_request_received
-                all_users.append(user)
-
-            if all_users and len(all_users) > 0:
-                return ExportUserList(user_list=all_users).model_dump().get("user_list")
+                if all_users and len(all_users) > 0:
+                    return (
+                        ExportUserList(user_list=all_users)
+                        .model_dump()
+                        .get("user_list")
+                    )
             else:
                 return None
 

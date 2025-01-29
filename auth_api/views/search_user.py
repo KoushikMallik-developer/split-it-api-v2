@@ -18,7 +18,8 @@ class SearchUsersView(APIView):
             user_id = decode_jwt_token(request=request)
             if validate_user_uid(uid=user_id).is_validated:
                 search_users = UserServices.get_searched_users(
-                    request_data=SearchUserRequestType(**request.data), uid=user_id
+                    request_data=SearchUserRequestType(**request.data),
+                    uid=user_id,
                 )
                 return Response(
                     data={
