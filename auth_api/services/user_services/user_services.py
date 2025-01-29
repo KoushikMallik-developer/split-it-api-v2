@@ -61,7 +61,9 @@ class UserServices:
             return None
 
     @staticmethod
-    def get_searched_users(request_data: SearchUserRequestType) -> Optional[list]:
+    def get_searched_users(
+        request_data: SearchUserRequestType, uid: str
+    ) -> Optional[list]:
         try:
             users = None
             if validate_email_format(request_data.keyword):
@@ -75,7 +77,10 @@ class UserServices:
                 users = User.objects.filter(query)[:10]
 
             if users and users.exists():
-                all_users = [ExportUser(**user.model_to_dict()) for user in users]
+                all_users = []
+                for user in users:
+                    if str(user.id) != uid:
+                        all_users.append(ExportUser(**user.model_to_dict()))
                 return ExportUserList(user_list=all_users).model_dump().get("user_list")
             else:
                 return None
