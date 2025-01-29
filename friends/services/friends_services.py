@@ -160,8 +160,8 @@ class UseFriendServices:
         request_data: AcceptFriendRequestType, uid: str
     ) -> dict:
         data: dict = {
-            "receiver": request_data.user_id,
-            "sender": uid,
+            "sender": request_data.user_id,
+            "receiver": uid,
         }
         AcceptFriendRequestSerializer().create(data=data)
         return {
