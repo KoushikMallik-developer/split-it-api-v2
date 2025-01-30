@@ -2,6 +2,7 @@ from django.urls import path
 
 from auth_api.views.all_users import AllUsersView
 from auth_api.views.create_user import CreateUsersView
+from auth_api.views.fetch_user import FetchUserView
 from auth_api.views.otp_view import SendOTPView
 from auth_api.views.password_reset import PasswordResetView
 from auth_api.views.refresh_token import RefreshTokenView
@@ -30,5 +31,6 @@ urlpatterns = [
     path("update-password", UpdatePasswordView.as_view(), name="Change-User-Password"),
     path("refresh-token", RefreshTokenView.as_view(), name="refresh-token"),
     path("search-users", SearchUsersView.as_view(), name="Search-Users"),
+    path("fetch-user", FetchUserView.as_view(), name="Fetch-User"),
     # path("clear-caches", ClearServerCaches.as_view(), name="clear-caches"),
 ]
