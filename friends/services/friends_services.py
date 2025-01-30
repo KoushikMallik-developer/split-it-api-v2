@@ -111,7 +111,9 @@ class UseFriendServices:
             raise DatabaseError()
         if friend_requests:
             friend_requests = [
-                ExportFriendRequest(**friend_request.model_to_dict())
+                ExportFriendRequest(
+                    include_receiver=True, **friend_request.model_to_dict()
+                )
                 for friend_request in friend_requests
             ]
             all_friend_details = ExportFriendRequestList(

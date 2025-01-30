@@ -28,9 +28,11 @@ class ExportFriendRequest(BaseModel):
     user: ExportUser
     created_at: datetime.datetime
 
-    def __init__(self, **kwargs):
-        if isinstance(kwargs["receiver"], User):
+    def __init__(self, include_receiver: bool = False, **kwargs):
+        if include_receiver and isinstance(kwargs["receiver"], User):
             kwargs["user"] = ExportUser(**kwargs["receiver"].model_to_dict())
+        elif isinstance(kwargs["sender"], User):
+            kwargs["user"] = ExportUser(**kwargs["sender"].model_to_dict())
         super().__init__(**kwargs)
 
 
