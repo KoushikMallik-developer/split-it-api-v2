@@ -1,7 +1,6 @@
 from django.urls import path
 
 from friends.views.accept_friend_request import AcceptFriendRequest
-from friends.views.all_friend_requests import AllFriendRequestsView
 from friends.views.all_friends import AllFriendsView
 from friends.views.my_received_friend_requests import MyReceivedFriendRequestsView
 from friends.views.my_sent_friend_requests import MySentFriendRequestsView
@@ -12,11 +11,11 @@ from friends.views.search_friend import SearchFriendView
 
 urlpatterns = [
     path("my-friends", AllFriendsView.as_view(), name="All-Friends"),
-    path(
-        "my-friend-requests",
-        AllFriendRequestsView.as_view(),
-        name="All-Friend-Requests",
-    ),
+    # path(
+    #     "my-friend-requests",
+    #     AllFriendRequestsView.as_view(),
+    #     name="All-Friend-Requests",
+    # ),
     path(
         "my-sent-friend-requests",
         MySentFriendRequestsView.as_view(),
