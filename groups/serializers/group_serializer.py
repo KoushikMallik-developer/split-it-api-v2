@@ -54,6 +54,7 @@ class GroupSerializer(serializers.ModelSerializer):
         members = request.members
         name = request.name
         image = request.image
+        description = request.description
 
         if self.validate(data):
             list_members: List[User] = [creator]
@@ -62,7 +63,9 @@ class GroupSerializer(serializers.ModelSerializer):
                 for member_id in members:
                     list_members.append(User.objects.get(id=member_id))
 
-            group = Group.objects.create(name=name, image=image, creator=creator)
+            group = Group.objects.create(
+                name=name, image=image, creator=creator, description=description
+            )
             group.members.set(list_members)
             group.save()
 
