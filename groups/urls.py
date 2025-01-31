@@ -13,5 +13,5 @@ urlpatterns = [
     path("update-group", UpdateGroupView.as_view(), name="Update-Group"),
     path("remove-group", RemoveGroupView.as_view(), name="Remove-Group"),
     path("search-group", SearchGroupView.as_view(), name="Search-Group"),
-    path("get-all-group", GetAllGroupView.as_view(), name="Get-all-Group"),
+    path("fetch-groups-by-user", GetAllGroupView.as_view(), name="Get-all-Groups"),
 ]

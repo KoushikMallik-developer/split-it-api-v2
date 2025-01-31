@@ -38,6 +38,8 @@ class RemoveFriendSerializer(serializers.ModelSerializer):
                 user = User.objects.get(id=user_id)
                 friend = user.friends.get(id=friend_id)
                 user.friends.remove(friend)
+                friend.friends.remove(user)
+                friend.save()
                 user.save()
             except ObjectDoesNotExist:
                 raise UserNotFoundError(msg="This user is not registered with us.")
