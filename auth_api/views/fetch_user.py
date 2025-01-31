@@ -12,7 +12,7 @@ from auth_api.services.user_services.user_services import UserServices
 class FetchUserView(APIView):
     renderer_classes = [JSONRenderer]
 
-    def get(self, request: Request):
+    def post(self, request: Request):
         try:
             request_data = request.data
             user_id = request_data.get("user_id")
