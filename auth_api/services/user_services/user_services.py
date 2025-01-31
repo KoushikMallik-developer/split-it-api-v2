@@ -235,6 +235,26 @@ class UserServices:
         return user_details
 
     @staticmethod
+    def get_user_details_by_id(requested_user_id: str, uid: str) -> ExportUser:
+        try:
+            current_user = User.objects.get(id=uid)
+            requested_user = User.objects.get(id=requested_user_id)
+            is_friend = current_user.friends.filter(id=requested_user.id).exists()
+            is_requested = FriendRequest.objects.filter(
+                sender=uid, receiver=requested_user.id
+            ).exists()
+            is_request_received = FriendRequest.objects.filter(
+                sender=requested_user.id, receiver=uid
+            ).exists()
+            requested_user = ExportUser(**requested_user.model_to_dict())
+            requested_user.is_friend = is_friend
+            requested_user.is_requested = is_requested
+            requested_user.is_request_received = is_request_received
+            return requested_user
+        except ObjectDoesNotExist:
+            raise UserNotFoundError()
+
+    @staticmethod
     def verify_user_with_otp(request_data: VerifyOTPRequestType):
         """
         Verify the user with the given OTP.
