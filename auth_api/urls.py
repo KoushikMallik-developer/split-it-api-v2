@@ -31,6 +31,6 @@ urlpatterns = [
     path("update-password", UpdatePasswordView.as_view(), name="Change-User-Password"),
     path("refresh-token", RefreshTokenView.as_view(), name="refresh-token"),
     path("search-users", SearchUsersView.as_view(), name="Search-Users"),
-    path("fetch-user", FetchUserView.as_view(), name="Fetch-User"),
+    path("user-details-by-id", FetchUserView.as_view(), name="Fetch-User"),
     # path("clear-caches", ClearServerCaches.as_view(), name="clear-caches"),
 ]
