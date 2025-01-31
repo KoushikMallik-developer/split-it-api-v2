@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from auth_api.export_types.validation_types.validation_result import ValidationResult
 from auth_api.models.user_models.user import User
-from auth_api.services.helpers import validate_user_email, validate_user_uid
+from auth_api.services.helpers import validate_user_uid
 from friends.friend_exceptions.friend_exceptions import FriendNotFoundError
 from groups.export_types.request_data_type.create_group import CreateGroupRequestType
 from groups.models.group import Group
@@ -31,14 +31,8 @@ class GroupSerializer(serializers.ModelSerializer):
             for member_id in members:
 
                 # check if the member is a valid email
-                if (
-                    member_id
-                    and member_id != ""
-                    and isinstance(member_id, str)
-                ):
-                    validation_result: ValidationResult = validate_user_uid(
-                        member_id
-                    )
+                if member_id and member_id != "" and isinstance(member_id, str):
+                    validation_result: ValidationResult = validate_user_uid(member_id)
                     is_validated = validation_result.is_validated
                     if not is_validated:
                         raise serializers.ValidationError(
@@ -47,9 +41,7 @@ class GroupSerializer(serializers.ModelSerializer):
 
                 # check if the member is a friend
                 if not user.friends.filter(id=member_id).exists():
-                    raise FriendNotFoundError(
-                        msg=f"'{member_id}' is not your friend."
-                    )
+                    raise FriendNotFoundError(msg=f"'{member_id}' is not your friend.")
 
         return True
 
