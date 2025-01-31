@@ -17,6 +17,7 @@ class ExportGroup(BaseModel):
     creator: ExportUser
     name: str
     description: Optional[str]
+    image: Optional[str]
     members: Optional[List[ExportUser]] = []
     created_at: datetime
     balances: Optional[dict]
