@@ -74,9 +74,9 @@ class UseFriendServices:
                     ExportUser(**friend.model_to_dict()) for friend in friends
                 ]
                 return (
-                    ExportUserList(friend_list=all_friends, user_id=user_id)
+                    ExportUserList(user_list=all_friends, user_id=user_id)
                     .model_dump()
-                    .get("friend_list")
+                    .get("user_list")
                 )
             else:
                 return None
