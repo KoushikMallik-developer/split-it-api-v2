@@ -2,6 +2,8 @@ import typing
 from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
+
+from _decimal import Decimal
 from django.core.exceptions import ObjectDoesNotExist
 from pydantic import BaseModel
 
@@ -21,6 +23,7 @@ class ExportGroup(BaseModel):
     members: Optional[List[ExportUser]] = []
     created_at: datetime
     balances: Optional[dict]
+    total_balance: Optional[Decimal]
     updated_at: datetime
 
     def __init__(self, **kwargs):
@@ -37,6 +40,8 @@ class ExportGroup(BaseModel):
                 str(balance.user.fname) + " " + str(balance.user.lname): balance.amount
                 for balance in balances
             }
+
+            kwargs["total_balance"] = sum(member.balance for member in members)
 
             super().__init__(**kwargs)
         except ObjectDoesNotExist:
