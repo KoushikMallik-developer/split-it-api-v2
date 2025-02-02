@@ -37,8 +37,7 @@ class ExportGroup(BaseModel):
 
             balances = Balance.objects.filter(group__id=kwargs["id"])
             kwargs["balances"] = {
-                str(balance.user.fname) + " " + str(balance.user.lname): balance.amount
-                for balance in balances
+                str(balance.user.id): balance.amount for balance in balances
             }
 
             super().__init__(**kwargs)
