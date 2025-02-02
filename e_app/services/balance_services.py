@@ -91,3 +91,9 @@ class BalanceServices:
         settlement.paid_to.balance += settlement.amount
         settlement.paid_to.save()
         balance.save()
+
+    @staticmethod
+    def update_group_total_spent(expense: Expense):
+        group = expense.group
+        group.total_spent += expense.amount
+        group.save()

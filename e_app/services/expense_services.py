@@ -25,7 +25,9 @@ class ExpenseService:
 
     def add_expense_service(self, data: AddExpenseRequestType) -> dict:
         expense = ExpenseSerializer().create(data.model_dump())
-        BalanceServices().update_user_group_balance(expense)
+        balance_services = BalanceServices()
+        balance_services.update_user_group_balance(expense)
+        balance_services.update_group_total_spent(expense)
         return {
             "message": "Expense added successfully.",
             "expense": ExportExpense(**expense.model_to_dict()),
