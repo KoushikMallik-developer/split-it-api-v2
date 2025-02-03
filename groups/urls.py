@@ -3,6 +3,7 @@ from django.urls import path
 from groups.view.add_members import AddMemberView
 from groups.view.create_group import CreateGroupView
 from groups.view.get_all_groups import GetAllGroupView
+from groups.view.get_group_by_id import GetGroupByIdView
 from groups.view.remove_group import RemoveGroupView
 from groups.view.search_group import SearchGroupView
 from groups.view.update_group import UpdateGroupView
@@ -14,4 +15,7 @@ urlpatterns = [
     path("remove-group", RemoveGroupView.as_view(), name="Remove-Group"),
     path("search-group", SearchGroupView.as_view(), name="Search-Group"),
     path("fetch-groups-by-user", GetAllGroupView.as_view(), name="Get-all-Groups"),
+    path(
+        "fetch-group-details-by-id", GetGroupByIdView.as_view(), name="Get-all-Groups"
+    ),
 ]
