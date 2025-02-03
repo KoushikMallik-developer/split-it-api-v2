@@ -40,8 +40,11 @@ from auth_api.services.helpers import (
 )
 from auth_api.services.otp_services.otp_services import OTPServices
 from auth_api.services.token_services.token_generator import TokenGenerator
+from e_app.export_types.export_expense_types.export_expense import ExportExpense
+from e_app.models.expense import Expense
 from friends.friend_exceptions.friend_exceptions import FriendNotFoundError
 from friends.models.friend_request import FriendRequest
+from groups.models.group import Group
 
 
 class UserServices:
@@ -289,3 +292,36 @@ class UserServices:
                 raise OTPNotVerifiedError()
         else:
             raise UserNotFoundError()
+
+    @staticmethod
+    def get_user_stat(uid: str) -> dict:
+
+        user = User.objects.get(id=uid)
+
+        expenses = Expense.objects.filter(participants__id=uid, is_deleted=False)
+        expenses_list = [
+            ExportExpense(**expense.model_to_dict()).model_dump()
+            for expense in expenses
+        ]
+
+        groups = Group.objects.filter(members__id=uid)
+        group_balance = [
+            {
+                "group_id": str(group.id),
+                "group_name": group.name,
+                "total_spent": group.total_spent,
+            }
+            for group in groups
+        ]
+
+        return {
+            "friends_count": user.friends.count(),
+            "groups_count": groups.count(),
+            "transaction_count": expenses.count(),
+            "user_balance": user.balance,
+            "user_koto_debay": 0,
+            "user_koto_pabey": 0,
+            "account_created_at": user.created_at,
+            "group_balance": group_balance,
+            "recent_transactions": expenses_list[:10],
+        }
