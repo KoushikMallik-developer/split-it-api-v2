@@ -8,14 +8,14 @@ from auth_api.services.helpers import validate_user_uid, decode_jwt_token
 from auth_api.services.user_services.user_services import UserServices
 
 
-class UserStatView(APIView):
+class UserStatsView(APIView):
     renderer_classes = [JSONRenderer]
 
     def get(self, request):
         try:
             user_id = decode_jwt_token(request=request)
             if validate_user_uid(uid=user_id).is_validated:
-                user_stat: dict = UserServices().get_user_stat(uid=user_id)
+                user_stat = UserServices().get_user_stat(uid=user_id).model_dump()
                 return Response(
                     data={
                         "message": "User stat fetched successfully.",
