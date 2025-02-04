@@ -312,34 +312,6 @@ class UserServices:
         if cached_data:
             return cached_data
         else:
-            # user = User.objects.only("id", "balance", "created_at").get(id=uid)
-            #
-            # # Fetch expenses efficiently
-            # expenses_qs = Expense.objects.filter(participants__id=uid, is_deleted=False).order_by('-created_at')
-            # recent_expenses = list(expenses_qs.values('id', 'amount', 'created_at')[:5])  # Fetch only required fields
-            #
-            # # Fetch group data efficiently
-            # groups_qs = Group.objects.filter(members__id=uid).order_by('-created_at')
-            # recent_groups = list(groups_qs.values('id', 'name', 'total_spent')[:5])  # Fetch only necessary fields
-            #
-            # # Calculate borrowed amount (sum of negative amounts)
-            # borrowed = expenses_qs.filter(amount__lt=0).aggregate(total_borrowed=Sum('amount'))['total_borrowed'] or 0
-            #
-            # # Calculate owed amount (sum of positive amounts)
-            # owed = expenses_qs.filter(amount__gt=0).aggregate(total_owed=Sum('amount'))['total_owed'] or 0
-            #
-            # api_data = {
-            #     "friends_count": user.friends.count(),
-            #     "groups_count": groups_qs.count(),
-            #     "transaction_count": expenses_qs.count(),
-            #     "total_balance": user.balance,
-            #     "payable": borrowed,
-            #     "receivable": owed,
-            #     "account_created_at": user.created_at,
-            #     "group_balance": recent_groups,
-            #     "recent_transactions": recent_expenses,
-            # }
-
             user = User.objects.only("id", "balance", "created_at").get(id=uid)
 
             # Fetch expenses
