@@ -1,8 +1,9 @@
 import os
 from typing import Optional
 
+from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q
+from django.db.models import Q, Sum
 from dotenv import load_dotenv
 from psycopg2 import DatabaseError
 
@@ -22,6 +23,11 @@ from auth_api.export_types.request_data_types.update_user_profile import (
     UpdateUserProfileRequestType,
 )
 from auth_api.export_types.request_data_types.verify_otp import VerifyOTPRequestType
+from auth_api.export_types.stat_data_type.user_stat import (
+    ExpenseModel,
+    GroupBalanceModel,
+    UserStatModel,
+)
 from auth_api.export_types.user_types.export_user import ExportUserList, ExportUser
 from auth_api.export_types.request_data_types.search_user import SearchUserRequestType
 from auth_api.models.user_models.user import User
@@ -40,8 +46,10 @@ from auth_api.services.helpers import (
 )
 from auth_api.services.otp_services.otp_services import OTPServices
 from auth_api.services.token_services.token_generator import TokenGenerator
+from e_app.models.expense import Expense
 from friends.friend_exceptions.friend_exceptions import FriendNotFoundError
 from friends.models.friend_request import FriendRequest
+from groups.models.group import Group
 
 
 class UserServices:
@@ -289,3 +297,76 @@ class UserServices:
                 raise OTPNotVerifiedError()
         else:
             raise UserNotFoundError()
+
+    # from django.db.models import Count, Sum
+
+    @staticmethod
+    def get_user_stat(uid: str) -> UserStatModel:
+
+        KEYWORD_PREFIX = "_STAT"
+        expiration_time = 1
+
+        cache_keyword = f"{uid.upper()}{KEYWORD_PREFIX}"
+        cached_data = cache.get(cache_keyword)
+
+        if cached_data:
+            return cached_data
+        else:
+            user = User.objects.only("id", "balance", "created_at").get(id=uid)
+
+            # Fetch expenses
+            expenses_qs = Expense.objects.filter(
+                participants__id=uid, is_deleted=False
+            ).order_by("-created_at")
+            recent_expenses = [
+                ExpenseModel(
+                    id=exp["id"], amount=exp["amount"], created_at=exp["created_at"]
+                )
+                for exp in expenses_qs.values("id", "amount", "created_at")[:5]
+            ]
+
+            # Fetch groups
+            groups_qs = Group.objects.filter(members__id=uid).order_by("-created_at")
+            recent_groups = [
+                GroupBalanceModel(
+                    group_id=str(group["id"]),
+                    group_name=group["name"],
+                    total_spent=group["total_spent"],
+                )
+                for group in groups_qs.values("id", "name", "total_spent")[:5]
+            ]
+
+            # Calculate payable (borrowed)
+            borrowed = (
+                expenses_qs.filter(amount__lt=0).aggregate(
+                    total_borrowed=Sum("amount")
+                )["total_borrowed"]
+                or 0
+            )
+            # Calculate receivable (owed)
+            owed = (
+                expenses_qs.filter(amount__gt=0).aggregate(total_owed=Sum("amount"))[
+                    "total_owed"
+                ]
+                or 0
+            )
+
+            data: UserStatModel = UserStatModel(
+                friends_count=user.friends.count(),
+                groups_count=groups_qs.count(),
+                transaction_count=expenses_qs.count(),
+                total_balance=user.balance,
+                payable=abs(borrowed),
+                receivable=owed,
+                account_created_at=user.created_at,
+                group_balance=recent_groups,
+                recent_transactions=recent_expenses,
+            )
+
+            cache.set(
+                cache_keyword,
+                data.model_dump(),
+                expiration_time,
+            )
+
+            return data

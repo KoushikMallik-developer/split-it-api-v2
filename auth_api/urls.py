@@ -12,6 +12,7 @@ from auth_api.views.sign_in import SignInView
 from auth_api.views.update_password import UpdatePasswordView
 from auth_api.views.update_profile import UpdateProfileView
 from auth_api.views.user_details import UserDetailView
+from auth_api.views.user_stat import UserStatsView
 from auth_api.views.validate_otp_view import ValidateOTPView
 
 urlpatterns = [
@@ -32,5 +33,6 @@ urlpatterns = [
     path("refresh-token", RefreshTokenView.as_view(), name="refresh-token"),
     path("search-users", SearchUsersView.as_view(), name="Search-Users"),
     path("user-details-by-id", FetchUserView.as_view(), name="Fetch-User"),
+    path("user-stats", UserStatsView.as_view(), name="User_Stat"),
     # path("clear-caches", ClearServerCaches.as_view(), name="clear-caches"),
 ]
