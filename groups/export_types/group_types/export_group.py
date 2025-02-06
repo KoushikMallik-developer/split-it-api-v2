@@ -34,11 +34,14 @@ class ExportGroup(BaseModel):
             kwargs["members"] = [
                 ExportUser(**member.model_to_dict()) for member in members
             ]
-
+            kwargs["balances"] = {}
             balances = Balance.objects.filter(group__id=kwargs["id"])
-            kwargs["balances"] = {
-                str(balance.user.id): balance.amount for balance in balances
-            }
+            for balance in balances:
+                kwargs["balances"][str(balance.user.id)] = {
+                    "name": balance.user.fname + " " + balance.user.lname,
+                    "spent": balance.spent,
+                    "balance": balance.amount,
+                }
 
             super().__init__(**kwargs)
         except ObjectDoesNotExist:

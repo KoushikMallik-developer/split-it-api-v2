@@ -15,6 +15,7 @@ class BalanceServices:
         balance = Balance.objects.get(
             user__id=expense.paid_by.id, group__id=expense.group.id
         )
+        balance.spent += expense.amount
         balance.amount += expense.amount
         expense.paid_by.balance += expense.amount  # User Personal ultimate balance
         expense.paid_by.save()

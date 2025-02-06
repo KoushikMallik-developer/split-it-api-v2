@@ -3,10 +3,14 @@ from typing import Optional
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 
+from e_app.expense_exceptions.expense_exceptions import NotAParticipantError
 from groups.export_types.group_types.export_group import ExportGroup, ExportGroupList
 from groups.export_types.request_data_type.add_member import AddMemberRequestType
 from groups.export_types.request_data_type.create_group import CreateGroupRequestType
 from groups.export_types.request_data_type.delete_group import DeleteGroupRequestType
+from groups.export_types.request_data_type.get_group_by_id_request_type import (
+    GetGroupByIdRequestType,
+)
 from groups.export_types.request_data_type.search_group import SearchGroupRequestType
 from groups.export_types.request_data_type.update_group import UpdateGroupRequestType
 from groups.group_exceptions.group_exceptions import (
@@ -117,5 +121,18 @@ class GroupServices:
             else:
                 return None
 
+        except ObjectDoesNotExist:
+            raise GroupNotFoundError()
+
+    def get_group_by_id_service(self, data: GetGroupByIdRequestType, uid: str) -> dict:
+        try:
+            group = Group.objects.get(id=data.group_id)
+            if group.members.filter(id=uid).exists():
+                return {
+                    "message": "Group fetched successfully",
+                    "data": ExportGroup(**group.model_to_dict()).model_dump(),
+                }
+            else:
+                raise NotAParticipantError()
         except ObjectDoesNotExist:
             raise GroupNotFoundError()
