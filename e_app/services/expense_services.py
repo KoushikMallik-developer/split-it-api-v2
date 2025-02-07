@@ -53,15 +53,24 @@ class ExpenseService:
         self, data: GetGroupExpenseRequestType, uid: str
     ) -> list:
         try:
-            group = Group.objects.get(id=data.group_id)
-            expenses = Expense.objects.filter(group__id=data.group_id, is_deleted=False)
-            if group.members.filter(id=uid).exists():
-                return [
-                    ExportExpense(**expense.model_to_dict()).model_dump()
-                    for expense in expenses
-                ]
-            else:
+            group = Group.objects.prefetch_related("members").get(id=data.group_id)
+
+            if not group.members.filter(id=uid).exists():
                 raise NotAParticipantError()
+
+            data_count = max(data.count, 0) if isinstance(data.count, int) else 0
+
+            expenses = (
+                Expense.objects.filter(group=group, is_deleted=False)[:data_count]
+                if data_count
+                else Expense.objects.filter(group=group, is_deleted=False)
+            )
+
+            return [
+                ExportExpense(**expense.model_to_dict()).model_dump()
+                for expense in expenses
+            ]
+
         except ObjectDoesNotExist:
             raise GroupNotFoundError()
 
