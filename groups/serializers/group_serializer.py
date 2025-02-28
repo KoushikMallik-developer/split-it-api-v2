@@ -19,7 +19,7 @@ class GroupSerializer(serializers.ModelSerializer):
         request: CreateGroupRequestType = data.get("request_data")
         uid: str = data.get("uid")
 
-        user = User.objects.get(id=uid)
+        user = User.objects.get(id=uid, is_deleted=False)
 
         members = request.members
         name = request.name
@@ -40,7 +40,7 @@ class GroupSerializer(serializers.ModelSerializer):
                         )
 
                 # check if the member is a friend
-                if not user.friends.filter(id=member_id).exists():
+                if not user.friends.filter(id=member_id, is_deleted=False).exists():
                     raise FriendNotFoundError(msg=f"'{member_id}' is not your friend.")
 
         return True
@@ -49,7 +49,7 @@ class GroupSerializer(serializers.ModelSerializer):
         request: CreateGroupRequestType = data.get("request_data")
         uid: str = data.get("uid")
 
-        creator: User = User.objects.get(id=uid)
+        creator: User = User.objects.get(id=uid, is_deleted=False)
 
         members = request.members
         name = request.name
@@ -61,7 +61,9 @@ class GroupSerializer(serializers.ModelSerializer):
 
             if members and len(members) > 0:
                 for member_id in members:
-                    list_members.append(User.objects.get(id=member_id))
+                    list_members.append(
+                        User.objects.get(id=member_id, is_deleted=False)
+                    )
 
             group = Group.objects.create(
                 name=name, image=image, creator=creator, description=description

@@ -17,6 +17,7 @@ def user_list():
             "password": "b'gAAAAABlcLJF0FLjcCWFUWQfRl442eAlZ9_IGgfUJAHlXpinOI_YrnpfUtXBfKpJifVI9T9JNuSUy9ax3oCyLbbqouA8rjd9Lg=='",  # pragma: allowlist-secret # noqa
             "image": "/images/users/defaultUserImage.png",
             "is_active": True,
+            "is_deleted": False,
         },
         {
             "id": "8a3a52ad-bb84-425c-bda7-884effd28374",
@@ -29,6 +30,7 @@ def user_list():
             "phone": None,
             "image": "/images/users/defaultUserImage.png",
             "is_active": False,
+            "is_deleted": False,
         },
     ]
 

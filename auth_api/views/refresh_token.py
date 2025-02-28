@@ -28,7 +28,7 @@ class RefreshTokenView(APIView):
             refresh = RefreshToken(token)
             refresh.verify()
             user_id = refresh["user_id"]
-            user = User.objects.get(id=user_id)
+            user = User.objects.get(id=user_id, is_deleted=False)
 
             new_refresh = RefreshToken.for_user(user)
             new_access_token = str(new_refresh.access_token)

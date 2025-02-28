@@ -24,13 +24,15 @@ class SettlementSerializer(serializers.ModelSerializer):
 
         try:
             if data.get("settled_by") and isinstance(data.get("settled_by"), str):
-                settled_by = User.objects.get(id=data.get("settled_by"))
+                settled_by = User.objects.get(
+                    id=data.get("settled_by"), is_deleted=False
+                )
         except ObjectDoesNotExist:
             raise UserNotFoundError("Specified user is not found.")
 
         try:
             if data.get("paid_to") and isinstance(data.get("paid_to"), str):
-                paid_to = User.objects.get(id=data.get("paid_to"))
+                paid_to = User.objects.get(id=data.get("paid_to"), is_deleted=False)
         except ObjectDoesNotExist:
             raise UserNotFoundError("Specified user is not found.")
 

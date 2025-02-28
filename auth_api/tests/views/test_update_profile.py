@@ -29,7 +29,7 @@ class TestUpdateProfileView:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["message"] == "User details updated Successfully."
 
-        user = User.objects.get(email="koushikmallik001@gmail.com")
+        user = User.objects.get(email="koushikmallik001@gmail.com", is_deleted=False)
         assert user.fname == "NewFirstName"
         assert user.lname == "NewLastName"
 

@@ -28,22 +28,22 @@ class AddMemberSerializer(serializers.ModelSerializer):
         group_id = request.group_id
         user_id = request.user_id
 
-        creator: User = User.objects.get(id=uid)
+        creator: User = User.objects.get(id=uid, is_deleted=False)
         group: Group = Group.objects.get(id=group_id)
 
         if str(group.creator.id) != uid:
             raise NotAnGroupAdminError()
 
-        if not User.objects.filter(id=user_id).exists():
+        if not User.objects.filter(id=user_id, is_deleted=False).exists():
             raise UserNotFoundError(msg="This user is not registered with us.")
 
-        if not creator.friends.filter(id=user_id).exists():
+        if not creator.friends.filter(id=user_id, is_deleted=False).exists():
             raise FriendNotFoundError(msg="This user is not your friend.")
 
         if not validate_group_uid(group_uid=group_id).is_validated:
             raise GroupNotFoundError()
 
-        member: User = User.objects.get(id=user_id)
+        member: User = User.objects.get(id=user_id, is_deleted=False)
 
         if group.members.filter(id=member.id).exists():
             raise UserAlreadyInGroupError()
@@ -59,7 +59,7 @@ class AddMemberSerializer(serializers.ModelSerializer):
 
             if self.validate(data):
                 group: Group = Group.objects.get(id=group_id)
-                user: User = User.objects.get(id=user_id)
+                user: User = User.objects.get(id=user_id, is_deleted=False)
 
                 group.members.add(user)
                 group.save()

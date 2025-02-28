@@ -36,16 +36,16 @@ class AcceptFriendRequestSerializer(serializers.ModelSerializer):
         else:
             raise ValueError("User ID is required.")
 
-        sender: User = User.objects.get(id=data.get("sender"))
+        sender: User = User.objects.get(id=data.get("sender"), is_deleted=False)
 
-        receiver: User = User.objects.get(id=data.get("receiver"))
+        receiver: User = User.objects.get(id=data.get("receiver"), is_deleted=False)
         if not receiver:
             raise UserNotAuthenticatedError()
 
         # Check if the user is already friends with the same user.
         already_a_friend: bool = (
-            sender.friends.filter(id=receiver.id).exists()
-            or receiver.friends.filter(id=sender.id).exists()
+            sender.friends.filter(id=receiver.id, is_deleted=False).exists()
+            or receiver.friends.filter(id=sender.id, is_deleted=False).exists()
         )
         if already_a_friend:
             raise AlreadyAFriendError()
@@ -56,8 +56,10 @@ class AcceptFriendRequestSerializer(serializers.ModelSerializer):
     def create(self, data: dict):
         if self.validate(data=data):
             try:
-                sender: User = User.objects.get(id=data.get("sender"))
-                receiver: User = User.objects.get(id=data.get("receiver"))
+                sender: User = User.objects.get(id=data.get("sender"), is_deleted=False)
+                receiver: User = User.objects.get(
+                    id=data.get("receiver"), is_deleted=False
+                )
 
                 existing_friend_request: FriendRequest = FriendRequest.objects.get(
                     sender__id=sender.id, receiver__id=receiver.id

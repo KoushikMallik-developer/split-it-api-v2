@@ -20,8 +20,12 @@ class RemoveFriendSerializer(serializers.ModelSerializer):
 
         # Check if the friend exists with the provided email
         try:
-            user: User = User.objects.get(id=data.get("primary_user_id"))
-            friend_exists = user.friends.filter(id=data.get("user_id")).exists()
+            user: User = User.objects.get(
+                id=data.get("primary_user_id"), is_deleted=False
+            )
+            friend_exists = user.friends.filter(
+                id=data.get("user_id"), is_deleted=False
+            ).exists()
             if not friend_exists:
                 raise FriendNotFoundError()
         except ObjectDoesNotExist:
@@ -35,7 +39,7 @@ class RemoveFriendSerializer(serializers.ModelSerializer):
             user_id = data.get("primary_user_id")
             friend_id = data.get("user_id")
             try:
-                user = User.objects.get(id=user_id)
+                user = User.objects.get(id=user_id, is_deleted=False)
                 friend = user.friends.get(id=friend_id)
                 user.friends.remove(friend)
                 friend.friends.remove(user)

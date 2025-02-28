@@ -10,50 +10,24 @@ class TestRemoveUserView:
     url = "/auth/api/v2/remove-user"
 
     def test_remove_user_success(self, api_client: APIClient, access_token: str):
-        data = {"email": "koushikmallik001@gmail.com"}
         headers = {
             "Authorization": "Bearer " + access_token,
             "Content-Type": "application/json",
         }
-        response = api_client.post(self.url, data, headers=headers, format="json")
+        response = api_client.post(self.url, headers=headers, format="json")
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data["message"] == "User removed Successfully."
 
-        with pytest.raises(User.DoesNotExist):
-            User.objects.get(email="koushikmallik001@gmail.com")
-
-    def test_remove_user_not_found(self, api_client: APIClient, access_token: str):
-        data = {"email": "nonexistentuser@example.com"}
-        headers = {
-            "Authorization": "Bearer " + access_token,
-            "Content-Type": "application/json",
-        }
-        response = api_client.post(self.url, data, headers=headers, format="json")
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert (
-            response.data["message"]
-            == "UserNotFoundError: This user is not registered. Please register as new user."
-        )
-
-    def test_remove_user_missing_email(self, api_client: APIClient, access_token: str):
-        data = {}
-        headers = {
-            "Authorization": "Bearer " + access_token,
-            "Content-Type": "application/json",
-        }
-        response = api_client.post(self.url, data, headers=headers, format="json")
-
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-        assert response.data["message"] == "ValueError: Email is required."
+        user = User.objects.get(email="koushikmallik001@gmail.com")
+        assert user
+        assert user.is_deleted is True
 
     def test_remove_user_unauthorized(self, api_client: APIClient):
-        data = {"email": "koushikmallik001@gmail.com"}
         headers = {
             "Content-Type": "application/json",
         }
-        response = api_client.post(self.url, data, headers=headers, format="json")
+        response = api_client.post(self.url, headers=headers, format="json")
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert (

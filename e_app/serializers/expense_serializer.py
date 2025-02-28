@@ -37,14 +37,14 @@ class ExpenseSerializer(Serializer):
         for participant_id in data.get("participants"):
             if not isinstance(participant_id, str):
                 raise ValueError("Participants must be a list of strings.")
-            participant = User.objects.get(id=participant_id)
+            participant = User.objects.get(id=participant_id, is_deleted=False)
             if not participant:
                 raise ValueError("Participant is not a valid user.")
             if not group.members.filter(id=participant.id).exists():
                 raise ValueError("Participant is not a member of the group.")
             participants.append(participant)
 
-        paid_by = User.objects.get(id=data.get("paid_by"))
+        paid_by = User.objects.get(id=data.get("paid_by"), is_deleted=False)
         if not paid_by:
             raise ValueError("Paid by user is not a valid user.")
 

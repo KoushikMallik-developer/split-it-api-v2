@@ -24,7 +24,7 @@ class SendOTPView(APIView):
             request_data = request.data
             email = request_data.get("email")
             if email and validate_user_email(email).is_validated:
-                user = User.objects.get(email=email)
+                user = User.objects.get(email=email, is_deleted=False)
                 if not user.is_active:
                     response = OTPServices().send_otp_to_user(email)
                     if response == "OK":

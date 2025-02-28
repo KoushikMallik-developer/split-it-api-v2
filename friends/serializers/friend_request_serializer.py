@@ -23,7 +23,7 @@ class FriendRequestSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def validate(self, data: Optional[dict] = None) -> Optional[bool]:
-        sender: User = User.objects.get(id=data.get("sender"))
+        sender: User = User.objects.get(id=data.get("sender"), is_deleted=False)
         if not sender:
             raise UserNotAuthenticatedError()
 
@@ -33,7 +33,7 @@ class FriendRequestSerializer(serializers.ModelSerializer):
         # Email Validation
         if data.get("receiver") and isinstance(data.get("receiver"), str):
             try:
-                receiver = User.objects.get(id=data.get("receiver"))
+                receiver = User.objects.get(id=data.get("receiver"), is_deleted=False)
             except ObjectDoesNotExist:
                 raise UserNotFoundError(msg="This user is not registered with us.")
         else:
@@ -53,8 +53,8 @@ class FriendRequestSerializer(serializers.ModelSerializer):
 
         # Check if the user is already friends with the same user.
         already_a_friend: bool = (
-            sender.friends.filter(id=receiver.id).exists()
-            or receiver.friends.filter(id=sender.id).exists()
+            sender.friends.filter(id=receiver.id, is_deleted=False).exists()
+            or receiver.friends.filter(id=sender.id, is_deleted=False).exists()
         )
         if already_a_friend:
             raise AlreadyAFriendError()
@@ -68,8 +68,8 @@ class FriendRequestSerializer(serializers.ModelSerializer):
 
     def create(self, data: dict) -> FriendRequest:
         if self.validate(data=data):
-            sender: User = User.objects.get(id=data.get("sender"))
-            receiver: User = User.objects.get(id=data.get("receiver"))
+            sender: User = User.objects.get(id=data.get("sender"), is_deleted=False)
+            receiver: User = User.objects.get(id=data.get("receiver"), is_deleted=False)
             new_friend_request = FriendRequest(sender=sender, receiver=receiver)
             new_friend_request.save()
             return new_friend_request

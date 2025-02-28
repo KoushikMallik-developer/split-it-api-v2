@@ -42,7 +42,7 @@ class UseFriendServices:
     @staticmethod
     def get_all_friends_service(user_id: str) -> Optional[list]:
         try:
-            friends = User.objects.get(id=user_id).friends.all()
+            friends = User.objects.get(id=user_id, is_deleted=False).friends.all()
         except Exception:
             raise DatabaseError()
         if friends:
@@ -58,16 +58,18 @@ class UseFriendServices:
         request_data: SearchFriendRequestType, user_id: str
     ) -> Optional[list]:
         try:
-            user: User = User.objects.get(id=user_id)
+            user: User = User.objects.get(id=user_id, is_deleted=False)
             if validate_email_format(request_data.keyword):
-                friends = user.friends.filter(email=request_data.keyword)
+                friends = user.friends.filter(
+                    email=request_data.keyword, is_deleted=False
+                )
 
             else:
                 keywords = request_data.keyword.split(" ")
                 query = Q()
                 for keyword in keywords:
                     query |= Q(fname__icontains=keyword) | Q(lname__icontains=keyword)
-                friends = user.friends.filter(query)
+                friends = user.friends.filter(query, is_deleted=False)
 
             if friends:
                 all_friends = [

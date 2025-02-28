@@ -42,7 +42,9 @@ def validate_user_email(email: str) -> ValidationResult:
     """
     if validate_email_format(email):
         existing_account = (
-            True if User.objects.filter(email=email).count() > 0 else False
+            True
+            if User.objects.filter(email=email, is_deleted=False).count() > 0
+            else False
         )
         if existing_account:
             return ValidationResult(
@@ -55,7 +57,9 @@ def validate_user_email(email: str) -> ValidationResult:
 
 
 def validate_user_uid(uid: str) -> ValidationResult:
-    existing_account = True if User.objects.filter(id=uid).count() > 0 else False
+    existing_account = (
+        True if User.objects.filter(id=uid, is_deleted=False).count() > 0 else False
+    )
     if existing_account:
         return ValidationResult(
             is_validated=True,
