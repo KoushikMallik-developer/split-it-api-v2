@@ -40,7 +40,7 @@ class ExpenseSerializer(Serializer):
             participant = User.objects.get(id=participant_id, is_deleted=False)
             if not participant:
                 raise ValueError("Participant is not a valid user.")
-            if not group.members.filter(id=participant.id).exists():
+            if not group.members.filter(id=participant.id, is_deleted=False).exists():
                 raise ValueError("Participant is not a member of the group.")
             participants.append(participant)
 
@@ -48,7 +48,7 @@ class ExpenseSerializer(Serializer):
         if not paid_by:
             raise ValueError("Paid by user is not a valid user.")
 
-        if not group.members.filter(id=paid_by.id).exists():
+        if not group.members.filter(id=paid_by.id, is_deleted=False).exists():
             raise ValueError("Paid by user is not a member of the group.")
 
         category = ExpenseCategory.objects.get(name=data.get("category").lower())

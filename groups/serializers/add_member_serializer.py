@@ -45,7 +45,7 @@ class AddMemberSerializer(serializers.ModelSerializer):
 
         member: User = User.objects.get(id=user_id, is_deleted=False)
 
-        if group.members.filter(id=member.id).exists():
+        if group.members.filter(id=member.id, is_deleted=False).exists():
             raise UserAlreadyInGroupError()
 
         return True

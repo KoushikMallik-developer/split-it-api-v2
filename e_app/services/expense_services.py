@@ -37,8 +37,8 @@ class ExpenseService:
         try:
             expense = Expense.objects.get(id=data.expense_id, is_deleted=False)
             if (
-                expense.group.members.filter(id=uid).exists()
-                and expense.participants.filter(id=uid).exists()
+                expense.group.members.filter(id=uid, is_deleted=False).exists()
+                and expense.participants.filter(id=uid, is_deleted=False).exists()
             ):
                 expense.is_deleted = True
                 expense.save()
@@ -55,7 +55,7 @@ class ExpenseService:
         try:
             group = Group.objects.prefetch_related("members").get(id=data.group_id)
 
-            if not group.members.filter(id=uid).exists():
+            if not group.members.filter(id=uid, is_deleted=False).exists():
                 raise NotAParticipantError()
 
             data_count = max(data.count, 0) if isinstance(data.count, int) else 0

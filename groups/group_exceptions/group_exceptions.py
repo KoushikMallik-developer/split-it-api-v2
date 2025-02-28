@@ -56,3 +56,12 @@ class GroupUpdateFailed(AUTHBaseException):
         else:
             super().__init__(msg)
         logging.error(self.msg)
+
+
+class GroupDeletionFailed(AUTHBaseException):
+    def __init__(self, msg: Optional[str] = None):
+        if not msg:
+            self.msg = "Group can not be deleted without settling all members balances."
+        else:
+            super().__init__(msg)
+        logging.error(self.msg)

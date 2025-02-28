@@ -4,6 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 
 from e_app.expense_exceptions.expense_exceptions import NotAParticipantError
+from e_app.models.balance import Balance
 from groups.export_types.group_types.export_group import ExportGroup, ExportGroupList
 from groups.export_types.request_data_type.add_member import AddMemberRequestType
 from groups.export_types.request_data_type.create_group import CreateGroupRequestType
@@ -18,6 +19,7 @@ from groups.group_exceptions.group_exceptions import (
     NotAnGroupAdminError,
     GroupUpdateFailed,
     GroupNotFoundError,
+    GroupDeletionFailed,
 )
 from groups.models.group import Group
 from groups.serializers.add_member_serializer import AddMemberSerializer
@@ -82,6 +84,12 @@ class GroupServices:
                 if str(group.creator.id) != uid:
                     raise NotAnGroupAdminError()
 
+                for member in group.members.all():
+                    balance = Balance.objects.get(
+                        group__id=group.id, user__id=member.id
+                    )
+                    if balance.amount != 0:
+                        raise GroupDeletionFailed()
                 group.delete()
             else:
                 raise GroupNotFoundError()
@@ -127,7 +135,7 @@ class GroupServices:
     def get_group_by_id_service(self, data: GetGroupByIdRequestType, uid: str) -> dict:
         try:
             group = Group.objects.get(id=data.group_id)
-            if group.members.filter(id=uid).exists():
+            if group.members.filter(id=uid, is_deleted=False).exists():
                 return {
                     "message": "Group fetched successfully",
                     "data": ExportGroup(**group.model_to_dict()).model_dump(),

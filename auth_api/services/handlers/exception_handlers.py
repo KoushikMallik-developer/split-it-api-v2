@@ -37,6 +37,7 @@ from groups.group_exceptions.group_exceptions import (
     NotAnGroupAdminError,
     GroupUpdateFailed,
     GroupNotCreatedError,
+    GroupDeletionFailed,
 )
 
 
@@ -109,6 +110,10 @@ class ExceptionHandler:
             },
             GroupNotFoundError: {
                 "message": "GroupNotFoundError",
+                "status": status.HTTP_400_BAD_REQUEST,
+            },
+            GroupDeletionFailed: {
+                "message": "GroupDeletionFailed",
                 "status": status.HTTP_400_BAD_REQUEST,
             },
             UserAlreadyInGroupError: {
