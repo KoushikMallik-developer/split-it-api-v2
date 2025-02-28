@@ -22,7 +22,7 @@ class TestCreateUsersView:
         assert response.status_code == status.HTTP_201_CREATED
         assert response.data["message"] == DEFAULT_VERIFICATION_MESSAGE
 
-        user = User.objects.get(email="testuser@example.com")
+        user = User.objects.get(email="testuser@example.com", is_deleted=False)
         assert user.fname == "Test"
         assert user.lname == "User"
 

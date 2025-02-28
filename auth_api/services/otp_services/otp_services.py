@@ -20,7 +20,7 @@ class OTPServices:
         email_services = EmailServices()
         cache_keyword = f"{user_email.upper()}{self.KEYWORD_PREFIX}"
         cached_data = cache.get(cache_keyword)
-        db_user = User.objects.get(email=user_email)
+        db_user = User.objects.get(email=user_email, is_deleted=False)
         if cached_data:
             response = email_services.send_otp_email_by_user_email(
                 user_email=user_email, otp=base64.b64decode(cached_data).decode("utf-8")
@@ -57,7 +57,7 @@ class OTPServices:
             return False
 
     def verify_otp(self, user: ExportUser, otp) -> bool:
-        user = User.objects.get(email=user.email)
+        user = User.objects.get(email=user.email, is_deleted=False)
         if self.__validate_otp(user=user, otp=otp):
             user.is_active = True
             user.save()

@@ -18,6 +18,7 @@ class ExportUser(BaseModel):
     image: Optional[str]
     balance: Optional[Decimal]
     is_active: bool
+    is_deleted: bool
     is_friend: Optional[bool] = None
     is_requested: Optional[bool] = None
     is_request_received: Optional[bool] = None

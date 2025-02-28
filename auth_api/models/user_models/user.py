@@ -26,11 +26,14 @@ class User(AbstractUser):
         if request_data.email and request_data.password:
             user_exists = (
                 True
-                if User.objects.filter(email=request_data.email).count() > 0
+                if User.objects.filter(
+                    email=request_data.email, is_deleted=False
+                ).count()
+                > 0
                 else False
             )
             if user_exists:
-                user = User.objects.get(email=request_data.email)
+                user = User.objects.get(email=request_data.email, is_deleted=False)
                 if user:
                     if (
                         EncryptionServices().decrypt(user.password)

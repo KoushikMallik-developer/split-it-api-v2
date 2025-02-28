@@ -28,7 +28,11 @@ class AuthEmailMessage(BaseModel):
     ) -> AuthEmailMessage:
         if user_email:
             if validate_user_email(user_email).is_validated:
-                user = ExportUser(**User.objects.get(email=user_email).model_to_dict())
+                user = ExportUser(
+                    **User.objects.get(
+                        email=user_email, is_deleted=False
+                    ).model_to_dict()
+                )
                 context = {"fname": user.fname, "reset_url": reset_url}
                 html_content = render_to_string("password_reset_email.html", context)
                 return cls(
@@ -47,8 +51,12 @@ class AuthEmailMessage(BaseModel):
         cls, user_email: str, otp: str
     ) -> AuthEmailMessage:
         if user_email:
-            if User.objects.filter(email=user_email).count() > 0:
-                user = ExportUser(**User.objects.get(email=user_email).model_to_dict())
+            if User.objects.filter(email=user_email, is_deleted=False).count() > 0:
+                user = ExportUser(
+                    **User.objects.get(
+                        email=user_email, is_deleted=False
+                    ).model_to_dict()
+                )
                 context = {"fname": user.fname, "otp": otp}
                 html_content = render_to_string("otp_email.html", context)
                 return cls(

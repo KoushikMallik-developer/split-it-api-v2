@@ -14,6 +14,7 @@ class AbstractUser(GenericBaseModel):
     phone = models.CharField(max_length=15, null=True)
     image = models.CharField(max_length=2555, null=True)
     is_active = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)
 
     class Meta:
         abstract = True
