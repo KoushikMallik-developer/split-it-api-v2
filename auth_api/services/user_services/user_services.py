@@ -7,6 +7,7 @@ from django.db.models import Q, Sum
 from dotenv import load_dotenv
 from psycopg2 import DatabaseError
 
+from auth_api import executor
 from auth_api.auth_exceptions.user_exceptions import (
     EmailNotSentError,
     UserNotFoundError,
@@ -302,13 +303,58 @@ class UserServices:
         else:
             raise UserNotFoundError()
 
-    # from django.db.models import Count, Sum
+    def fetch_expenses_for_user_stat(self, uid: str):
+        # Fetch expenses
+        expenses_qs = Expense.objects.filter(
+            participants__id=uid, is_deleted=False
+        ).order_by("-created_at")
+        return (
+            expenses_qs,
+            [
+                ExpenseModel(
+                    id=exp["id"], amount=exp["amount"], created_at=exp["created_at"]
+                )
+                for exp in expenses_qs.values("id", "amount", "created_at")
+            ],
+        )
 
-    @staticmethod
-    def get_user_stat(uid: str) -> UserStatModel:
+    def fetch_groups_for_user_stat(self, uid: str):
+        # Fetch groups
+        groups_qs = Group.objects.filter(members__id=uid).order_by("-created_at")
+        return (
+            groups_qs,
+            [
+                GroupBalanceModel(
+                    group_id=str(group["id"]),
+                    group_name=group["name"],
+                    total_spent=group["total_spent"],
+                )
+                for group in groups_qs.values("id", "name", "total_spent")
+            ],
+        )
+
+    def fetch_borrowed_amount_for_user_stat(self, expenses_qs):
+        # Calculate payable (borrowed)
+        return (
+            expenses_qs.filter(amount__lt=0).aggregate(total_borrowed=Sum("amount"))[
+                "total_borrowed"
+            ]
+            or 0
+        )
+
+    def fetch_owed_amount_for_user_stat(self, expenses_qs):
+        # Calculate receivable (owed)
+        return (
+            expenses_qs.filter(amount__gt=0).aggregate(total_owed=Sum("amount"))[
+                "total_owed"
+            ]
+            or 0
+        )
+
+    def get_user_stat(self, uid: str) -> UserStatModel:
 
         KEYWORD_PREFIX = "_STAT"
-        expiration_time = 1
+        expiration_time = 0
 
         cache_keyword = f"{uid.upper()}{KEYWORD_PREFIX}"
         cached_data = cache.get(cache_keyword)
@@ -318,42 +364,21 @@ class UserServices:
         else:
             user = User.objects.only("id", "balance", "created_at").get(id=uid)
 
-            # Fetch expenses
-            expenses_qs = Expense.objects.filter(
-                participants__id=uid, is_deleted=False
-            ).order_by("-created_at")
-            recent_expenses = [
-                ExpenseModel(
-                    id=exp["id"], amount=exp["amount"], created_at=exp["created_at"]
-                )
-                for exp in expenses_qs.values("id", "amount", "created_at")[:5]
-            ]
+            expenses_future = executor.submit(self.fetch_expenses_for_user_stat, uid)
+            groups_future = executor.submit(self.fetch_groups_for_user_stat, uid)
 
-            # Fetch groups
-            groups_qs = Group.objects.filter(members__id=uid).order_by("-created_at")
-            recent_groups = [
-                GroupBalanceModel(
-                    group_id=str(group["id"]),
-                    group_name=group["name"],
-                    total_spent=group["total_spent"],
-                )
-                for group in groups_qs.values("id", "name", "total_spent")[:5]
-            ]
+            expenses_qs, recent_expenses = expenses_future.result()
+            groups_qs, recent_groups = groups_future.result()
 
-            # Calculate payable (borrowed)
-            borrowed = (
-                expenses_qs.filter(amount__lt=0).aggregate(
-                    total_borrowed=Sum("amount")
-                )["total_borrowed"]
-                or 0
+            owed_future = executor.submit(
+                self.fetch_owed_amount_for_user_stat, expenses_qs
             )
-            # Calculate receivable (owed)
-            owed = (
-                expenses_qs.filter(amount__gt=0).aggregate(total_owed=Sum("amount"))[
-                    "total_owed"
-                ]
-                or 0
+            borrowed_future = executor.submit(
+                self.fetch_borrowed_amount_for_user_stat, expenses_qs
             )
+
+            owed = owed_future.result()
+            borrowed = borrowed_future.result()
 
             data: UserStatModel = UserStatModel(
                 friends_count=user.friends.count(),
